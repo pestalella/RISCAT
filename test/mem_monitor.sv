@@ -3,7 +3,7 @@ class mem_monitor extends uvm_monitor;
 
 	`uvm_component_utils(mem_monitor)
 
-	virtual memsys_if#(.ADDR_BITS(4),.DATA_BITS(8)) vif;
+	virtual memsys_if vif;
 	uvm_analysis_port #(mem_transaction) m_ap;
 
 	function new(string name, uvm_component parent);
@@ -13,7 +13,7 @@ class mem_monitor extends uvm_monitor;
 	function void build_phase(uvm_phase phase);
 		`uvm_info(get_type_name(), "build_phase", UVM_MEDIUM)
 		m_ap = new("m_ap", this);
-		if( !uvm_config_db #(virtual memsys_if#(.ADDR_BITS(4),.DATA_BITS(8)))::get(this, "", "memsys_if", vif) )
+		if( !uvm_config_db #(virtual memsys_if)::get(this, "", "memsys_if", vif) )
 			`uvm_error(get_type_name(), "uvm_config_db::get failed")
 	endfunction
 

@@ -1,16 +1,32 @@
 `timescale 1ns / 1ps
 
+interface exec_unit_if(
+	input logic clk,
+	output logic reset_n
+);
+
+	logic rd_ram_en;
+	logic [31:0] rd_ram_addr;
+	logic [31:0] rd_ram_data;
+	logic wr_ram_en;
+	logic [31:0] wr_ram_addr;
+	logic [31:0] wr_ram_data;
+
+endinterface
+
+
 module exec_unit (
-    input  wire clk,
-    input  wire reset_n,
+    // input  wire clk,
+    // input  wire reset_n,
 
-    output wire rd_ram_en,
-    output wire [31:0] rd_ram_addr,
-    input  wire [31:0] rd_ram_data,
+    // output wire rd_ram_en,
+    // output wire [31:0] rd_ram_addr,
+    // input  wire [31:0] rd_ram_data,
 
-    output wire wr_ram_en,
-    output wire [31:0] wr_ram_addr,
-    output wire [31:0] wr_ram_data,
+    // output wire wr_ram_en,
+    // output wire [31:0] wr_ram_addr,
+    // output wire [31:0] wr_ram_data
+		exec_unit_if exec_if
 );
 
   logic [31:0] pc;
@@ -25,26 +41,28 @@ module exec_unit (
 	logic reg_rd1_en;
 	logic reg_wr_en;
 
+
+	regfile_if regfile_interface();
+
+	assign regfile_interface.clk = exec_if.clk;
+	assign regfile_interface.reset_n = exec_if.reset_n;
+	assign regfile_interface.rd0_en = reg_rd0_en;
+	assign regfile_interface.rd0_addr = reg_rd0_addr;
+	assign regfile_interface.rd0_data = regfile_rd0_data;
+	assign regfile_interface.rd1_en = reg_rd1_en;
+	assign regfile_interface.rd1_addr = reg_rd1_addr;
+	assign regfile_interface.rd1_data = regfile_rd1_data;
+	assign regfile_interface.wr_en = reg_wr_en;
+	assign regfile_interface.wr_addr = reg_wr_addr;
+	assign regfile_interface.wr_data = reg_wr_data;
+
 	register32bit_file registers(
-		.clk(clk),
-		.reset_n(reset_n),
-
-		.rd0_enable(reg_rd0_en),
-		.rd0_addr(reg_rd0_addr),
-		.rd0_data(regfile_rd0_data),
-
-		.rd1_enable(reg_rd1_en),
-		.rd1_addr(reg_rd1_addr),
-		.rd1_data(regfile_rd1_data),
-
-		.wr_enable(reg_wr_en),
-		.wr_addr(reg_wr_addr),
-		.wr_data(reg_wr_data)
+		.reg_if(regfile_interface)
 	);
 
 	// Update program counter
-	always @(posedge clk) begin
-			if (!reset_n) begin
+	always @(posedge exec_if.clk) begin
+			if (!exec_if.reset_n) begin
 					pc  <= 0;
 			end else begin
 					pc  <= pc + 4;
@@ -52,8 +70,8 @@ module exec_unit (
 	end
 
 	// Clear internal data on reset
-  always @(posedge clk) begin
-    if (!reset_n) begin
+  always @(posedge exec_if.clk) begin
+    if (!exec_if.reset_n) begin
 			reg_rd0_addr <= '0;
 			reg_rd1_addr <= '0;
 			reg_wr_addr <= '0;

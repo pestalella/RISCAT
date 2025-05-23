@@ -3,7 +3,7 @@ class mem_driver extends uvm_driver #(mem_transaction);
 
 	`uvm_component_utils(mem_driver)
 
-	virtual memsys_if#(.ADDR_BITS(4),.DATA_BITS(8)) vif;
+	virtual memsys_if vif;
 
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
@@ -11,7 +11,7 @@ class mem_driver extends uvm_driver #(mem_transaction);
 
 	function void build_phase(uvm_phase phase);
 		`uvm_info(get_type_name(), "build_phase in mem_driver", UVM_MEDIUM)
-		if( !uvm_config_db #(virtual memsys_if#(.ADDR_BITS(4),.DATA_BITS(8)))::get(this, "", "memsys_if", vif) )
+		if( !uvm_config_db #(virtual memsys_if)::get(this, "", "memsys_if", vif) )
 			`uvm_error(get_type_name(), "uvm_config_db::get failed")
 	endfunction
 

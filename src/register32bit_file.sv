@@ -20,20 +20,6 @@ interface regfile_if;
 endinterface
 
 module register32bit_file (
-    // input wire clk,
-    // input wire reset_n,
-    // // register reading
-    // input logic [4:0] rd0_addr,
-    // input logic rd0_enable,
-    // output logic [31:0] rd0_data,
-    // // register reading
-    // input logic [4:0] rd1_addr,
-    // input logic rd1_enable,
-    // output logic [31:0] rd1_data,
-    // // register writing
-    // input logic [3:0] wr_addr,
-    // input logic wr_enable,
-    // input logic [31:0] wr_data
 		regfile_if reg_if
 	);
 

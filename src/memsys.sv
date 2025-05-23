@@ -13,31 +13,28 @@
 
 `timescale 1ns / 1ps
 
-interface memsys_if#(
-		parameter ADDR_BITS = 16,
-			      DATA_BITS = 32
-	);
+interface memsys_if;
 
 	logic clk;
 	logic rd_en;
-	logic [ADDR_BITS-1:0] rd_addr;
-	logic [DATA_BITS-1:0] rd_data;
+	logic [15:0] rd_addr;
+	logic [31:0] rd_data;
 	logic wr_en;
-	logic [ADDR_BITS-1:0] wr_addr;
-	logic [DATA_BITS-1:0] wr_data;
+	logic [15:0] wr_addr;
+	logic [31:0] wr_data;
 
 endinterface
 
-module memsys#(
-    parameter ADDR_BITS = 16,
-              DATA_BITS = 32
-	)	(	memsys_if mem_if );
+
+module memsys#(parameter ADDR_BITS = 16) (
+	memsys_if mem_if
+);
 
 	import uvm_pkg::*;
 
-	logic [DATA_BITS-1:0] memory [(1<<ADDR_BITS) - 1:0];
+	logic [31:0] memory [(1<<ADDR_BITS) - 1:0];
 
-	assign mem_if.rd_data = mem_if.rd_en ? memory[mem_if.rd_addr] : {DATA_BITS{1'bz}};
+	assign mem_if.rd_data = mem_if.rd_en ? memory[mem_if.rd_addr] : {32{1'bz}};
 
 	always @(posedge mem_if.clk)
 	begin
