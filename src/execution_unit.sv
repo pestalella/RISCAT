@@ -14,18 +14,7 @@ interface exec_unit_if(
 
 endinterface
 
-
 module exec_unit (
-    // input  wire clk,
-    // input  wire reset_n,
-
-    // output wire rd_ram_en,
-    // output wire [31:0] rd_ram_addr,
-    // input  wire [31:0] rd_ram_data,
-
-    // output wire wr_ram_en,
-    // output wire [31:0] wr_ram_addr,
-    // output wire [31:0] wr_ram_data
 		exec_unit_if exec_if
 );
 
@@ -40,7 +29,6 @@ module exec_unit (
 	logic reg_rd0_en;
 	logic reg_rd1_en;
 	logic reg_wr_en;
-
 
 	regfile_if regfile_interface();
 
