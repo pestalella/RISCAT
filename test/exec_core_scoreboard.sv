@@ -29,7 +29,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
     exec_core_transaction tx = exec_core_transaction::type_id::create("tx", this);
     tx.copy(t);
 		transaction_count = transaction_count + 1;
-		if (tx.cmd == RESET) begin
+		if (tx.cmd == CMD_RESET) begin
 			reset_count += 1;
 		end
   endfunction

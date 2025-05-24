@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
 
+`include "r32i_isa.svh"
+
 class exec_core_driver extends uvm_driver #(exec_core_transaction);
 
 	`uvm_component_utils(exec_core_driver)
@@ -33,17 +35,27 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 			seq_item_port.get_next_item(req);
 			`uvm_info(get_type_name(), req.sprint(), UVM_MEDIUM)
 
-			if (req.cmd == RESET)
+			if (req.cmd == CMD_RESET)
 			begin
 				@(posedge vif.clk);
 				vif.reset_n  <= 0;
 				@(posedge vif.clk);
 				vif.reset_n  <= 1;
-			end else begin
+			end else if (req.cmd == CMD_ADDI)
+			begin
+				@(posedge vif.rd_ram_en);  // wait for the memory read request
+				vif.rd_ram_data <= generate_instruction(ADDI);
+				@(posedge vif.clk);
+			end	else begin
 				`uvm_fatal(get_type_name(), "Unimplemented command in transaction")
 			end
 
 			seq_item_port.item_done();
 		end
 	endtask
+
+	function generate_instruction(exec_core_cmd cmd);
+		reg_imm_instruction inst = new(ADDI);
+		return inst.encoded();
+	endfunction
 endclass: exec_core_driver

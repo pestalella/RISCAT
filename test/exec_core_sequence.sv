@@ -10,6 +10,8 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 
 	task body;
 		`uvm_info(get_type_name(), "Sequence start", UVM_MEDIUM)
+		// Perform an initial RESET to clean up the cpu state
+		`uvm_do_with(req, { req.cmd == CMD_RESET; })
 		repeat(2)
 		begin
 			`uvm_do(req)
