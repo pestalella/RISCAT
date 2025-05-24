@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 
 class mem_sequence extends uvm_sequence #(mem_transaction);
 

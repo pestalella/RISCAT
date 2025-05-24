@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 
 class exec_core_monitor extends uvm_monitor;
 

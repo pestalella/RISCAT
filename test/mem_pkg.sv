@@ -1,6 +1,6 @@
-`include "uvm_macros.svh"
-
 `timescale 1ns/1ns
+
+`include "uvm_macros.svh"
 
 package mem_pkg;
 

@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 typedef enum {RESET, READA, READB, READAB, WRITE} regfile_cmd;
 
 class registerfile_transaction extends uvm_sequence_item;

@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 
 class registerfile_sequence extends uvm_sequence #(registerfile_transaction);
 

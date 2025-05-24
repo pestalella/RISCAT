@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 
 class registerfile_driver extends uvm_driver #(registerfile_transaction);
 

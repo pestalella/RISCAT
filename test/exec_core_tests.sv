@@ -1,4 +1,4 @@
-
+`timescale 1ns / 1ps
 
 class exec_core_reset extends uvm_test;
 

@@ -2,8 +2,6 @@
 
 `include "uvm_macros.svh"
 
-`timescale 1ns/1ns
-
 package exec_core_pkg;
 
 	import uvm_pkg::*;

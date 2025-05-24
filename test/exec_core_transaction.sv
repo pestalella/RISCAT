@@ -1,4 +1,5 @@
-typedef enum {RESET} regfile_cmd;
+`timescale 1ns / 1ps
+
 
 class exec_core_transaction extends uvm_sequence_item;
 
