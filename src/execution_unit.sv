@@ -1,14 +1,14 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 1ns
 
 interface exec_unit_if(
 	input logic clk,
 	output logic reset_n
 );
 
-	logic rd_ram_en;
+	wire rd_ram_en;
 	logic [31:0] rd_ram_addr;
 	logic [31:0] rd_ram_data;
-	logic wr_ram_en;
+	wire wr_ram_en;
 	logic [31:0] wr_ram_addr;
 	logic [31:0] wr_ram_data;
 
@@ -29,6 +29,10 @@ module exec_unit (
 	logic reg_rd0_en;
 	logic reg_rd1_en;
 	logic reg_wr_en;
+
+	logic rd_mem_en;
+
+	assign exec_if.rd_ram_en = rd_mem_en;
 
 	regfile_if regfile_interface();
 
@@ -69,4 +73,122 @@ module exec_unit (
 		end
 	end
 
+	logic fetch_en;
+	logic fetch_started;
+	logic fetch_completed;
+	wire [31:0] fetched_inst;
+
+	initial begin
+		fetch_en <= 1;
+		rd_mem_en <= 0;
+	end
+
+	fetch_stage0 fetch0(
+		.clk(exec_if.clk),
+		.reset_n(exec_if.reset_n),
+		.fetch_en(fetch_en),
+		.fetch_started(fetch_started),
+		.pc(pc),
+		.rd_ram_en(rd_mem_en),
+		.rd_ram_addr(exec_if.rd_ram_addr)
+	);
+
+	fetch_stage1 fetch1(
+		.clk(exec_if.clk),
+		.reset_n(exec_if.reset_n),
+		.fetch_en(fetch_en),
+		.fetch_started(fetch_started),
+		.fetch_completed(fetch_completed),
+		.rd_ram_data(exec_if.rd_ram_data),
+		.fetched_inst(fetched_inst)
+	);
+
+	decode_stage decode(
+		.clk(exec_if.clk),
+		.reset_n(exec_if.reset_n),
+		.fetched_inst(fetched_inst)
+	);
+
+
+  always @(posedge exec_if.clk) begin
+
+	end
+
+endmodule
+
+
+module fetch_stage0(
+	input logic clk,
+	input logic reset_n,
+	input logic fetch_en,
+	input logic [31:0] pc,
+
+	output logic fetch_started,
+	output logic rd_ram_en,
+	output logic [31:0] rd_ram_addr
+	);
+
+	always @(posedge clk) begin
+		if (!reset_n) begin
+				rd_ram_en <= 0;
+				fetch_started <= 0;
+		end else begin
+			if (fetch_en) begin
+				rd_ram_addr <= pc;
+				rd_ram_en <= 1;
+				fetch_started <= 1;
+			end else begin
+				rd_ram_en <= 0;
+				fetch_started <= 0;
+			end
+		end
+	end
+
+endmodule
+
+
+module fetch_stage1(
+	input logic clk,
+	input logic reset_n,
+	input logic fetch_started,
+	input logic [31:0] rd_ram_data,
+
+	output logic fetch_en,
+	output logic fetch_completed,
+	output logic [31:0] fetched_inst
+	);
+
+	logic [31:0] fetched_inst_r;
+	assign fetched_inst = fetched_inst_r;
+
+	always @(posedge clk) begin
+		if (!reset_n) begin
+				fetched_inst_r <= 0;
+				fetch_completed <= 0;
+		end else begin
+			if (fetch_started) begin
+				fetched_inst_r <= rd_ram_data;
+				fetch_completed <= 1;
+				fetch_en <= 0;
+			end else begin
+				fetch_completed <= 0;
+			end
+		end
+	end
+
+endmodule
+
+module decode_stage(
+	input logic clk,
+	input logic reset_n,
+	input	logic [31:0] fetched_inst
+);
+
+	bit is_reg_imm_inst;
+
+	assign is_reg_imm_inst = fetched_inst[6:0] == 7'b0010011;
+
+	always @(posedge clk) begin
+
+	end
 endmodule

@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 1ns
 
 class registerfile_scoreboard extends uvm_scoreboard;
 

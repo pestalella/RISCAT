@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 1ns
 
 class registerfile_monitor extends uvm_monitor;
 

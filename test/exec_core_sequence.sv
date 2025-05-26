@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 1ns
 
 class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 

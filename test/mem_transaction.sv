@@ -1,4 +1,4 @@
-`timescale 1ns / 1ps
+`timescale 1ns / 1ns
 
 	typedef enum {READ, WRITE} mem_cmd;
 
