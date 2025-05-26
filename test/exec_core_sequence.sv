@@ -14,7 +14,8 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		`uvm_do_with(req, { req.cmd == CMD_RESET; })
 		repeat(2)
 		begin
-			`uvm_do(req)
+			`uvm_do_with(req, { req.cmd == CMD_ADDI; })
+			// `uvm_do(req)
 		end
 	endtask: body
 

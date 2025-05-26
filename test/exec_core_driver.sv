@@ -8,22 +8,11 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 
 	virtual exec_unit_if vif;
 
-	logic reset_n;
-  logic [4:0] m_wr_addr;
-  logic [31:0] m_wr_data;
-	logic [4:0] m_r0_addr;
-	logic [31:0] m_r0_data;
-	logic [4:0] m_r1_addr;
-	logic [31:0] m_r1_data;
-
-///	assign vif.reset_n = reset_n;
-
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
 	endfunction
 
 	function void build_phase(uvm_phase phase);
-		reset_n = 1;
 		`uvm_info(get_type_name(), "build_phase in exec_core_driver", UVM_MEDIUM)
 		if( !uvm_config_db #(virtual exec_unit_if)::get(this, "", "exec_unit_if", vif) )
 			`uvm_error(get_type_name(), "uvm_config_db::get failed")
@@ -43,7 +32,10 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				vif.reset_n  <= 1;
 			end else if (req.cmd == CMD_ADDI)
 			begin
+				`uvm_info(get_type_name(), "GOT ADDI, WAITING FOR vif.rd_ram_en", UVM_MEDIUM)
 				@(posedge vif.rd_ram_en);  // wait for the memory read request
+				`uvm_info(get_type_name(), "Got vif.rd_ram_en, injecting ADDI instruction", UVM_MEDIUM)
+				@(posedge vif.clk);
 				vif.rd_ram_data <= generate_instruction(ADDI);
 				@(posedge vif.clk);
 			end	else begin
@@ -54,8 +46,9 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 		end
 	endtask
 
-	function generate_instruction(exec_core_cmd cmd);
+	function bit[31:0] generate_instruction(instruction rv_inst);
 		reg_imm_instruction inst = new(ADDI);
+		`uvm_info(get_type_name(), $sformatf("Generated instruction: 0x%h", inst.encoded()), UVM_MEDIUM)
 		return inst.encoded();
 	endfunction
 endclass: exec_core_driver
