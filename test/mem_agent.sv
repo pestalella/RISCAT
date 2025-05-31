@@ -1,4 +1,3 @@
-`timescale 1ns / 1ns
 
 class mem_agent extends uvm_agent;
 

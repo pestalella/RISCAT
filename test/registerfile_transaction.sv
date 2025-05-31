@@ -1,4 +1,4 @@
-`timescale 1ns / 1ns
+
 
 typedef enum {RESET, READA, READB, READAB, WRITE} regfile_cmd;
 

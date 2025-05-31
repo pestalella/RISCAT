@@ -1,4 +1,4 @@
-`timescale 1ns / 1ns
+
 
 class mem_monitor extends uvm_monitor;
 

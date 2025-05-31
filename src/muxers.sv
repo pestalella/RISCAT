@@ -1,4 +1,3 @@
-`timescale 1ns / 1ns
 
 module mux2to1 #(parameter DATA_BITS = 32) (
     input sel,

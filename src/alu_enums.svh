@@ -1,8 +1,6 @@
 `ifndef ALU_ENUMS_SVH
 `define ALU_ENUMS_SVH
 
-`timescale 1ns / 1ns
-
 typedef enum bit[3:0] {
 	ALU_NONE,
 	ALU_ADD,

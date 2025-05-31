@@ -1,8 +1,6 @@
 `ifndef R32I_ISA_SVH
 `define R32I_ISA_SVH
 
-`timescale 1ns / 1ns
-
 typedef enum {ADDI} instruction;
 
 class reg_imm_instruction;
@@ -19,7 +17,7 @@ class reg_imm_instruction;
 			// randomize(dest);
 			imm = 12'b101010101010;
 			src = 1;
-			dest = 17;
+			dest = 1;
 			inst_sel = 3'b000;
 			opcode = 7'b0010011;
 		end

@@ -1,4 +1,3 @@
-`timescale 1ns / 1ns
 
 class exec_core_scoreboard extends uvm_scoreboard;
 

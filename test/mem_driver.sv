@@ -1,4 +1,3 @@
-`timescale 1ns / 1ns
 
 class mem_driver extends uvm_driver #(mem_transaction);
 
