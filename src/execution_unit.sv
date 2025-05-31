@@ -1,6 +1,9 @@
-`timescale 1ns / 1ns
 
 `include "alu_enums.svh"
+`include "register32bit_file.sv"
+`include "fetch_unit.sv"
+`include "decode_unit.sv"
+`include "alu.sv"
 
 interface exec_unit_if(
 	input logic clk,
@@ -25,12 +28,6 @@ module exec_unit (
 	wire [31:0] regfile_rd0_data;
 	wire [31:0] regfile_rd1_data;
   wire [31:0] reg_wr_data;
-	//logic [4:0] reg_rd0_addr;
-	//logic [4:0] reg_rd1_addr;
-	//logic [4:0] reg_wr_addr;
-	//logic reg_rd0_en;
-	//logic reg_rd1_en;
-	//logic reg_wr_en;
 
 	logic [4:0] decode_reg_rd0_addr;
 	logic [4:0] decode_reg_rd1_addr;
@@ -43,9 +40,12 @@ module exec_unit (
 	alu_command_t decode_alu_op;
   logic [31:0] alu_result;
 
-	logic rd_mem_en;
+	logic reg_store_wr_en;
+	logic [4:0] reg_store_wr_addr;
+  logic [31:0] reg_store_wr_data;
 
-	assign exec_if.rd_ram_en = rd_mem_en;
+	// always read a new instruction
+	assign exec_if.rd_ram_en = 1;
 
 	regfile_if regfile_interface();
 
@@ -57,9 +57,9 @@ module exec_unit (
 	assign regfile_interface.rd1_en = decode_reg_rd1_en;
 	assign regfile_interface.rd1_addr = decode_reg_rd1_addr;
 	assign regfile_rd1_data = regfile_interface.rd1_data;
-	assign regfile_interface.wr_en = decode_reg_wr_en;
-	assign regfile_interface.wr_addr = decode_reg_wr_addr;
-	assign regfile_interface.wr_data = reg_wr_data;
+	assign regfile_interface.wr_en = reg_store_wr_en;
+	assign regfile_interface.wr_addr = reg_store_wr_addr;
+	assign regfile_interface.wr_data = reg_store_wr_data;
 
 	register32bit_file registers(
 		.reg_if(regfile_interface)
@@ -80,33 +80,21 @@ module exec_unit (
 		end
 	end
 
-	logic fetch_en;
 	logic fetch_started;
 	logic fetch_completed;
 	wire [31:0] fetched_inst;
 	logic alu_result_ready;
 
-	initial begin
-		fetch_en <= 1;
-		rd_mem_en <= 0;
-	end
-
 	fetch_stage0 fetch0(
 		.clk(exec_if.clk),
 		.reset_n(exec_if.reset_n),
-		.fetch_en(fetch_en),
-		.fetch_started(fetch_started),
 		.pc(pc),
-		.rd_ram_en(rd_mem_en),
 		.rd_ram_addr(exec_if.rd_ram_addr)
 	);
 
 	fetch_stage1 fetch1(
 		.clk(exec_if.clk),
 		.reset_n(exec_if.reset_n),
-		.fetch_en(fetch_en),
-		.fetch_started(fetch_started),
-		.fetch_completed(fetch_completed),
 		.rd_ram_data(exec_if.rd_ram_data),
 		.fetched_inst(fetched_inst)
 	);
@@ -137,100 +125,29 @@ module exec_unit (
 		.result_ready(alu_result_ready),
 		.alu_result(alu_result)
 	);
+	assign reg_store_wr_addr = decode_reg_wr_addr;
+	assign reg_store_wr_data = alu_result;
+	assign reg_store_wr_en = decode_reg_wr_en;
 
 endmodule
 
 
-module fetch_stage0(
-	input logic clk,
-	input logic reset_n,
-	input logic fetch_en,
-	input logic [31:0] pc,
+module register_store(
+	input logic result_ready,
+	input logic [31:0] alu_result,
+	input logic decode_reg_wr_en,
+	input logic [4:0] decode_reg_wr_addr,
 
-	output logic fetch_started,
-	output logic rd_ram_en,
-	output logic [31:0] rd_ram_addr
-	);
-
-	always @(posedge clk) begin
-		if (!reset_n) begin
-				rd_ram_en <= 0;
-				fetch_started <= 0;
-		end else begin
-			if (fetch_en) begin
-				rd_ram_addr <= pc;
-				rd_ram_en <= 1;
-				fetch_started <= 1;
-			end else begin
-				rd_ram_en <= 0;
-				fetch_started <= 0;
-			end
-		end
-	end
-
-endmodule
-
-
-module fetch_stage1(
-	input logic clk,
-	input logic reset_n,
-	input logic fetch_started,
-	input logic [31:0] rd_ram_data,
-
-	output logic fetch_en,
-	output logic fetch_completed,
-	output logic [31:0] fetched_inst
-	);
-
-	logic [31:0] fetched_inst_r;
-	assign fetched_inst = fetched_inst_r;
-
-	always @(posedge clk) begin
-		if (!reset_n) begin
-				fetched_inst_r <= 0;
-				fetch_completed <= 0;
-		end else begin
-			if (fetch_started) begin
-				fetched_inst_r <= rd_ram_data;
-				fetch_completed <= 1;
-				fetch_en <= 0;
-			end else begin
-				fetch_completed <= 0;
-			end
-		end
-	end
-
-endmodule
-
-module alu_stage(
-	input logic clk,
-	input logic reset_n,
-	input logic [11:0] immediate,
-	input logic [31:0] regfile_rd0_data,
-	input logic [31:0] regfile_rd1_data,
-	input logic input_a_is_immediate,
-	input alu_command_t alu_op,
-	output bit result_ready,
-	output logic [31:0] alu_result
+	output logic [4:0] reg_wr_addr,
+	output logic [31:0] reg_wr_data,
+	output logic reg_wr_en
 );
 
-	always @(posedge clk) begin
-		if (!reset_n) begin
-			alu_result <= '0;
-			result_ready <= 0;
-		end else begin
-			if (alu_op == ALU_NONE) begin
-				alu_result <= '0;
-				result_ready <= 0;
-			end else if (alu_op == ALU_ADD) begin
-				alu_result <=  input_a_is_immediate? immediate + regfile_rd1_data : 0;
-				result_ready <= 1;
-			end else begin
-				alu_result <= 'hdeadbeef;
-				result_ready <= 0;
-			end
-		end
-	end
-
+always @(result_ready) begin
+	reg_wr_addr <= decode_reg_wr_addr;
+	reg_wr_data <= alu_result;
+	reg_wr_en <=  decode_reg_wr_en;
+end
 
 endmodule
+
