@@ -1,4 +1,8 @@
-`timescale 1ns / 1ns
+`ifndef __REGISTER32BIT_FILE_SV__
+`define __REGISTER32BIT_FILE_SV__
+
+`include "muxers.sv"
+`include "register32bit.sv"
 
 interface regfile_if;
 
@@ -153,3 +157,5 @@ module register32bit_file (
 	end
 
 endmodule
+
+`endif

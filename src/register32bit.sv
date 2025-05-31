@@ -1,4 +1,5 @@
-`timescale 1ns / 1ns
+`ifndef __REGISTER32BIT_SV__
+`define __REGISTER32BIT_SV__
 
 module register32bit (
     input wire clk,
@@ -14,7 +15,7 @@ module register32bit (
     logic [31:0] bits;
     always @(negedge clk)
         if (!reset_n)
-            bits <= 0;
+            bits <= '0;
         else if (load) begin
             assert (^data_in !== 1'bX)
                 else $display("Assertion fail:  load=1 and data_in=%b", data_in);
@@ -24,3 +25,5 @@ module register32bit (
     assign data_out0 = out0_en? bits : {32{1'bz}};
     assign data_out1 = out1_en? bits : {32{1'bz}};
 endmodule
+
+`endif

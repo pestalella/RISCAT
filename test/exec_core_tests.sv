@@ -1,4 +1,10 @@
-`timescale 1ns / 1ns
+`ifndef __EXEC_CORE_TESTS_SV__
+`define __EXEC_CORE_TESTS_SV__
+
+`include "exec_core_env.sv"
+
+`include "uvm_macros.svh"
+import uvm_pkg::*;
 
 class exec_core_reset extends uvm_test;
 
@@ -16,3 +22,5 @@ class exec_core_reset extends uvm_test;
 	endfunction
 
 endclass: exec_core_reset
+
+`endif

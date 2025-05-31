@@ -1,5 +1,9 @@
+`ifndef __EXEC_CORE_AGENT__
+`define __EXEC_CORE_AGENT__
 
-`timescale 1ns / 1ns
+`include "exec_core_transaction.sv"
+`include "exec_core_driver.sv"
+`include "exec_core_monitor.sv"
 
 class exec_core_agent extends uvm_agent;
 
@@ -30,3 +34,4 @@ class exec_core_agent extends uvm_agent;
 
 endclass: exec_core_agent
 
+`endif

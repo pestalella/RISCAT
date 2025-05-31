@@ -1,14 +1,22 @@
+`ifndef __TB_TOP_SV__
+`define __TB_TOP_SV__
+
 `timescale 1ns / 1ns
 
 `include "uvm_macros.svh"
+//`include "exec_core_pkg.sv"
+//`include "mem_pkg.sv"
+`include "exec_core_tests.sv"
+`include "register_file_probe_if.sv"
+`include "../src/execution_unit.sv"
 
 import uvm_pkg::*;
 
 module top;
 
 	import uvm_pkg::*;
-	import mem_pkg::*;
-	import exec_core_pkg::*;
+//	import mem_pkg::*;
+	//import exec_core_pkg::*;
 
 	logic clk;
 	logic reset_n;
@@ -19,6 +27,16 @@ module top;
 	wire [31:0] wr_mem_data;
 	wire rd_mem_en;
 	wire wr_mem_en;
+
+
+  register_file_probe_wrapper probe_wrapper(.clk(clk));
+
+	// bind tb_top.exec_core.registers register_file_probe_if register_file_probe_inst(
+	// 	.clk(reg_if.clk),
+	// 	.wr_en(reg_if.wr_en),
+	// 	.wr_addr(reg_if.wr_addr),
+	// 	.wr_data(reg_if.wr_data)
+	// );
 
 	// memsys_if memory_interface();
 
@@ -52,7 +70,6 @@ module top;
 
 	initial
 	begin
-		reset_n = 0;
 		clk = 0;
 		forever #5 clk = ~clk;
 	end
@@ -60,7 +77,6 @@ module top;
 	initial
 	begin
 		$timeformat(-9, 0, " ns", 5); //$timeformat( units_number , precision_number , suffix_string , minimum_field_width )
-		//uvm_config_db #(virtual regfile_if)::set(null, "*", "regfile_if", reg_if);
 		//run_test("mem_test");
 		//run_test("registerfile_test");
 		//uvm_config_db #(virtual memsys_if)::set(null, "*", "mem_if", memory_interface);
@@ -69,3 +85,5 @@ module top;
 	end
 
 endmodule: top
+
+`endif

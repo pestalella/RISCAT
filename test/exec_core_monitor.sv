@@ -1,4 +1,3 @@
-`timescale 1ns / 1ns
 
 class exec_core_monitor extends uvm_monitor;
 
@@ -24,12 +23,12 @@ class exec_core_monitor extends uvm_monitor;
 		begin
 			// exec_core_transaction tx;
 			@(posedge vif.clk);
-			// if (!vif.reset_n) begin
-			// 	tx = exec_core_transaction::type_id::create("tx", this);
-			// 	tx.cmd  = RESET;
-			// 	m_ap.write(tx);
-			// end
-			// else if (vif.rd_ram_en) begin
+			if (!vif.reset_n) begin
+				// tx = exec_core_transaction::type_id::create("tx", this);
+				// tx.cmd  = RESET;
+				// m_ap.write(tx);
+			end else if (vif.rd_ram_en) begin
+			end
 			// 	tx = exec_core_transaction::type_id::create("tx", this);
 			// 	tx.cmd  = READ_MEM;
 			// 	tx.rd0_addr = vif.rd0_addr;

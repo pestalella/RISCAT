@@ -1,6 +1,8 @@
-`timescale 1ns / 1ns
-
 typedef enum {CMD_RESET, CMD_ADDI} exec_core_cmd;
+
+`include "uvm_macros.svh"
+
+import uvm_pkg::*;
 
 class exec_core_transaction extends uvm_sequence_item;
 
@@ -21,3 +23,6 @@ class exec_core_transaction extends uvm_sequence_item;
 	`uvm_object_utils_end
 
 endclass: exec_core_transaction
+
+typedef uvm_sequencer #(exec_core_transaction) exec_core_sequencer;
+

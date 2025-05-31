@@ -1,6 +1,4 @@
-`timescale 1ns / 1ns
-
-`include "r32i_isa.svh"
+`include "../src/r32i_isa.svh"
 
 class exec_core_driver extends uvm_driver #(exec_core_transaction);
 
@@ -33,7 +31,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 			end else if (req.cmd == CMD_ADDI)
 			begin
 				`uvm_info(get_type_name(), "GOT ADDI, WAITING FOR vif.rd_ram_en", UVM_MEDIUM)
-				@(posedge vif.rd_ram_en);  // wait for the memory read request
+//				@(posedge vif.rd_ram_en);  // wait for the memory read request
 				`uvm_info(get_type_name(), "Got vif.rd_ram_en, injecting ADDI instruction", UVM_MEDIUM)
 				vif.rd_ram_data <= generate_instruction(ADDI);
 				@(posedge vif.clk);
