@@ -1,3 +1,5 @@
+`ifndef __MUXERS_SV__
+`define __MUXERS_SV__
 
 module mux2to1 #(parameter DATA_BITS = 32) (
     input sel,
@@ -338,3 +340,5 @@ module demux1to32 #(parameter DATA_BITS = 32) (
     assign  out30 = (sel == 'b11110) ? in : {DATA_BITS{1'bz}};
     assign  out31 = (sel == 'b11111) ? in : {DATA_BITS{1'bz}};
 endmodule
+
+`endif

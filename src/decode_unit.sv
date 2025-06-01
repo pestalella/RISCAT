@@ -1,3 +1,6 @@
+`ifndef __DECODE_UNIT_SV__
+`define __DECODE_UNIT_SV__
+
 `include "alu_enums.svh"
 
 module decode_unit(
@@ -68,3 +71,4 @@ module decode_unit(
 	end
 endmodule
 
+`endif

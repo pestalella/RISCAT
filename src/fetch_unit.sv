@@ -1,3 +1,6 @@
+`ifndef __FETCH_UNIT_SV__
+`define __FETCH_UNIT_SV__
+
 module fetch_stage0(
 	input logic clk,
 	input logic reset_n,
@@ -58,3 +61,6 @@ module fetch_stage1(
 	end
 
 endmodule
+
+`endif
+

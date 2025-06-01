@@ -1,3 +1,6 @@
+`ifndef __ALU_SV__
+`define __ALU_SV__
+
 `include "alu_enums.svh"
 
 module alu_stage(
@@ -33,3 +36,4 @@ module alu_stage(
 endmodule
 
 
+`endif
