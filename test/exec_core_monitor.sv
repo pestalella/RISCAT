@@ -6,7 +6,7 @@ class exec_core_monitor extends uvm_monitor;
 	virtual exec_unit_if execunit_vif;
 	virtual register_file_probe_if regfile_vif;
 
-	uvm_analysis_port #(exec_core_transaction) m_ap;
+	uvm_analysis_port #(exec_core_action) m_ap;
 
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
@@ -31,6 +31,14 @@ class exec_core_monitor extends uvm_monitor;
 				// tx = exec_core_transaction::type_id::create("tx", this);
 				// tx.cmd  = RESET;
 				// m_ap.write(tx);
+			end else if (execunit_vif.rd_ram_en) begin
+				exec_core_action tx;
+
+				// Notify the scoreboard we have pbserved an instruction fetch
+				tx = exec_core_action::type_id::create("tx", this);
+				tx.m_inst_name = INST_ADDI;
+				m_ap.write(tx);
+
 			end else if (regfile_vif.wr_en) begin
 				`uvm_info(get_type_name(), $sformatf("Detected a register file write. r%d = %d", regfile_vif.wr_addr, regfile_vif.wr_data), UVM_MEDIUM);
 			end

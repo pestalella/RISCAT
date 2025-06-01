@@ -38,7 +38,8 @@ class exec_core_env extends uvm_env;
 	endfunction : build_phase
 
 	function void connect_phase(uvm_phase phase);
-		m_agent.m_monitor.m_ap.connect(m_scoreboard.analysis_export);
+		m_agent.m_monitor.m_ap.connect(m_scoreboard.m_ap);
+		m_agent.m_driver.m_ap.connect(m_scoreboard.m_ap);
 	endfunction : connect_phase
 
 	task run_phase(uvm_phase phase);
