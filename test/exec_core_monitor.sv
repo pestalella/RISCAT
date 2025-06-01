@@ -3,7 +3,9 @@ class exec_core_monitor extends uvm_monitor;
 
 	`uvm_component_utils(exec_core_monitor)
 
-	virtual exec_unit_if vif;
+	virtual exec_unit_if execunit_vif;
+	virtual register_file_probe_if regfile_vif;
+
 	uvm_analysis_port #(exec_core_transaction) m_ap;
 
 	function new(string name, uvm_component parent);
@@ -13,8 +15,10 @@ class exec_core_monitor extends uvm_monitor;
 	function void build_phase(uvm_phase phase);
 		`uvm_info(get_type_name(), "build_phase", UVM_MEDIUM)
 		m_ap = new("m_ap", this);
-		if( !uvm_config_db #(virtual exec_unit_if)::get(this, "", "exec_unit_if", vif) )
-			`uvm_error(get_type_name(), "uvm_config_db::get failed")
+		if( !uvm_config_db #(virtual exec_unit_if)::get(this, "", "exec_unit_if", execunit_vif) )
+			`uvm_error(get_type_name(), "No exec_unit_if found in uvm_config_db")
+		if( !uvm_config_db #(virtual register_file_probe_if)::get(this, "", "register_file_probe_if", regfile_vif) )
+			`uvm_error(get_type_name(), "No register_file_probe_if found in uvm_config_db")
 	endfunction
 
 	task run_phase(uvm_phase phase);
@@ -22,12 +26,13 @@ class exec_core_monitor extends uvm_monitor;
 		forever
 		begin
 			// exec_core_transaction tx;
-			@(posedge vif.clk);
-			if (!vif.reset_n) begin
+			@(posedge execunit_vif.clk);
+			if (!execunit_vif.reset_n) begin
 				// tx = exec_core_transaction::type_id::create("tx", this);
 				// tx.cmd  = RESET;
 				// m_ap.write(tx);
-			end else if (vif.rd_ram_en) begin
+			end else if (regfile_vif.wr_en) begin
+				`uvm_info(get_type_name(), $sformatf("Detected a register file write. r%d = %d", regfile_vif.wr_addr, regfile_vif.wr_data), UVM_MEDIUM);
 			end
 			// 	tx = exec_core_transaction::type_id::create("tx", this);
 			// 	tx.cmd  = READ_MEM;
@@ -38,7 +43,7 @@ class exec_core_monitor extends uvm_monitor;
 			// else if (!vif.rd0_en && vif.rd1_en) begin
 			// 	tx = exec_core_transaction::type_id::create("tx", this);
 			// 	tx.cmd  = READB;
-			// 	tx.rd1_addr = vif.rd1_addr;
+			// 	tx.rd1_addr = vif.rd1_addr;k
 			// 	tx.rd1_data = vif.rd1_data;
 			// 	m_ap.write(tx);
 			// end

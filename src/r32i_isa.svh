@@ -23,6 +23,12 @@ class reg_imm_instruction;
 		end
 	endfunction
 
+	function string sprint();
+		return $sformatf(
+			"- Instruction -\n---------------\nopcode: %07b\nsel: %03b\nsrc: %d\ndest: %d\nimm: %d",
+			opcode, inst_sel, src, dest,  imm);
+	endfunction
+
 	function bit[31:0] encoded();
 		return {>>{imm, src, inst_sel, dest, opcode}};
 	endfunction

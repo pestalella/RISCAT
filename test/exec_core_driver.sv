@@ -20,7 +20,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 		forever
 		begin
 			seq_item_port.get_next_item(req);
-			`uvm_info(get_type_name(), req.sprint(), UVM_MEDIUM)
+			`uvm_info(get_type_name(), $sformatf("\n%s", req.sprint()), UVM_MEDIUM)
 
 			if (req.cmd == CMD_RESET)
 			begin
@@ -30,10 +30,10 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				vif.reset_n  <= 1;
 			end else if (req.cmd == CMD_ADDI)
 			begin
+				reg_imm_instruction inst = new(ADDI);
 				`uvm_info(get_type_name(), "GOT ADDI, WAITING FOR vif.rd_ram_en", UVM_MEDIUM)
-//				@(posedge vif.rd_ram_en);  // wait for the memory read request
-				`uvm_info(get_type_name(), "Got vif.rd_ram_en, injecting ADDI instruction", UVM_MEDIUM)
-				vif.rd_ram_data <= generate_instruction(ADDI);
+				`uvm_info(get_type_name(), $sformatf("Got vif.rd_ram_en, injecting ADDI instruction:\n%s", inst.sprint()), UVM_MEDIUM)
+				vif.rd_ram_data <= inst.encoded();
 				@(posedge vif.clk);
 			end	else begin
 				`uvm_fatal(get_type_name(), "Unimplemented command in transaction")
