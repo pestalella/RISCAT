@@ -1,0 +1,9 @@
+# compile verilog/system verilog design source files
+sv xil_defaultlib  \
+"test/tb_top.sv" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl/glbl.v"
+
+# Do not sort compile order
+nosort
