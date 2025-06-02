@@ -6,7 +6,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 	`uvm_component_utils(exec_core_driver)
 
 	virtual exec_unit_if vif;
-	uvm_analysis_port #(exec_core_action) m_ap;
+	uvm_analysis_port #(exec_core_message) m_ap;
 
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
@@ -23,7 +23,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 		forever
 		begin
 			seq_item_port.get_next_item(req);
-			`uvm_info(get_type_name(), $sformatf("\n%s", req.sprint()), UVM_MEDIUM)
+			// `uvm_info(get_type_name(), $sformatf("\n%s", req.sprint()), UVM_MEDIUM)
 
 			if (req.cmd == CMD_RESET)
 			begin
@@ -33,18 +33,18 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				vif.reset_n  <= 1;
 			end else if (req.cmd == CMD_ADDI)
 			begin
-				exec_core_action action_received;
+				exec_core_message action_received;
 				reg_imm_instruction inst = new(ADDI);
 
 				`uvm_info(get_type_name(), "GOT ADDI, WAITING FOR vif.rd_ram_en", UVM_MEDIUM)
 				`uvm_info(get_type_name(), $sformatf("Got vif.rd_ram_en, injecting ADDI instruction:\n%s", inst.sprint()), UVM_MEDIUM)
 				vif.rd_ram_data <= inst.encoded();
 
-				action_received = exec_core_action::type_id::create("action_received", this);
+				action_received = exec_core_message::type_id::create("action_received", this);
 				action_received.imm = inst.imm;
 				action_received.src = inst.src;
 				action_received.dest = inst.dest;
-				action_received.m_inst_name = INST_ADDI;
+				action_received.m_action = INST_ADDI;
 				m_ap.write(action_received);
 
 				@(posedge vif.clk);

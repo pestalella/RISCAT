@@ -57,7 +57,7 @@ module exec_unit (
 	assign regfile_interface.rd1_en = decode_reg_rd1_en;
 	assign regfile_interface.rd1_addr = decode_reg_rd1_addr;
 	assign regfile_rd1_data = regfile_interface.rd1_data;
-	assign regfile_interface.wr_en = reg_store_wr_en;
+	assign regfile_interface.wr_en = reg_store_wr_en & alu_result_ready;
 	assign regfile_interface.wr_addr = reg_store_wr_addr;
 	assign regfile_interface.wr_data = reg_store_wr_data;
 

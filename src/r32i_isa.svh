@@ -25,7 +25,7 @@ class reg_imm_instruction;
 
 	function string sprint();
 		return $sformatf(
-			"- Instruction -\n---------------\nopcode: %07b\nsel: %03b\nsrc: %d\ndest: %d\nimm: %d",
+			"------------------------------\n- Instruction -\n------------------------------\n  opcode:\t%07b\n  sel:\t%03b\n  src:\t%d\n  dest:\t%d\n  imm:\t%d\n------------------------------",
 			opcode, inst_sel, src, dest,  imm);
 	endfunction
 
