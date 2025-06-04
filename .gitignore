@@ -21,6 +21,7 @@
 !*.svh
 !*.bd
 !*.edif
+!Makefile
 #########
 #IP files
 #########
@@ -34,7 +35,7 @@
 #*.dcp(checkpoint files)
 !*.dcp
 !*.vds
-!*.pb
+#!*.pb
 #All bd comments and layout coordinates are stored within .ui
 !*.ui
 !*.ooc
@@ -53,7 +54,7 @@
 #MIG
 #########
 !*.prj
-!*.mem
+#!*.mem
 #########
 #Project files
 #########
@@ -74,7 +75,7 @@
 #########
 #Journal - files
 #########
-!*.jou
+#!*.jou
 #########
 #Reports
 #########
