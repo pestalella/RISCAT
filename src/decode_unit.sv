@@ -39,7 +39,7 @@ module decode_unit(
 	assign is_ori   = is_reg_imm_inst && (inst_f3 == 'b110);
 	assign is_andi  = is_reg_imm_inst && (inst_f3 == 'b111);
 
-	always @(posedge clk) begin
+	always @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
 			reg_rd0_addr <= 0;
 			reg_rd1_addr <= 0;

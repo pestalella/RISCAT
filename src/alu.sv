@@ -15,7 +15,7 @@ module alu_stage(
 	output logic [31:0] alu_result
 );
 
-	always @(posedge clk) begin
+	always @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
 			alu_result <= '0;
 			result_ready <= 0;
@@ -34,6 +34,5 @@ module alu_stage(
 	end
 
 endmodule
-
 
 `endif
