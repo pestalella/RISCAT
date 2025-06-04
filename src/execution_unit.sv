@@ -19,6 +19,23 @@ interface exec_unit_if(
 
 endinterface
 
+
+typedef struct packed {
+	logic [31:0] fetched_inst;
+} IF_ID;
+
+typedef struct packed {
+	logic [4:0] reg_rd0_addr;
+	logic [4:0] reg_rd1_addr;
+	logic [4:0] reg_wr_addr;
+	logic reg_rd0_en;
+	logic reg_rd1_en;
+	logic reg_wr_en;
+	logic input_a_is_immediate;
+	logic [11:0] inst_imm;
+	alu_command_t alu_op;
+} ID_EX;
+
 module exec_unit (
 		exec_unit_if exec_if
 );
@@ -85,21 +102,16 @@ module exec_unit (
 	wire [31:0] fetched_inst;
 	logic alu_result_ready;
 
-	fetch_stage0 fetch0(
+	fetch_stage instruction_fetch(
 		.clk(exec_if.clk),
 		.reset_n(exec_if.reset_n),
 		.pc(pc),
-		.rd_ram_addr(exec_if.rd_ram_addr)
-	);
-
-	fetch_stage1 fetch1(
-		.clk(exec_if.clk),
-		.reset_n(exec_if.reset_n),
+		.rd_ram_addr(exec_if.rd_ram_addr),
 		.rd_ram_data(exec_if.rd_ram_data),
 		.fetched_inst(fetched_inst)
 	);
 
-	decode_unit decode(
+	decode_unit instruction_decode(
 		.clk(exec_if.clk),
 		.reset_n(exec_if.reset_n),
 		.fetched_inst(fetched_inst),
