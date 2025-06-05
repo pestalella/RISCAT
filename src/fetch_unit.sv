@@ -1,6 +1,8 @@
 `ifndef __FETCH_UNIT_SV__
 `define __FETCH_UNIT_SV__
 
+`include "pipeline_stage_registers.sv"
+
 module fetch_stage(
 	input logic clk,
 	input logic reset_n,
@@ -8,11 +10,11 @@ module fetch_stage(
 	input logic [31:0] rd_ram_data,
 
 	output logic [31:0] rd_ram_addr,
-	output logic [31:0] fetched_inst
+	output IF_ID if_id_reg
 	);
 
 	logic [31:0] fetched_inst_r;
-	assign fetched_inst = fetched_inst_r;
+	assign if_id_reg.fetched_inst = fetched_inst_r;
 
 	always @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin

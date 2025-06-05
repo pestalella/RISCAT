@@ -2,15 +2,16 @@
 `define __ALU_SV__
 
 `include "alu_enums.svh"
+`include "pipeline_stage_registers.sv"
 
 module alu_stage(
 	input logic clk,
 	input logic reset_n,
-	input logic [11:0] immediate,
+
+	input ID_EX id_ex_reg,
 	input logic [31:0] regfile_rd0_data,
 	input logic [31:0] regfile_rd1_data,
-	input logic input_a_is_immediate,
-	input alu_command_t alu_op,
+
 	output bit result_ready,
 	output logic [31:0] alu_result
 );
@@ -20,11 +21,11 @@ module alu_stage(
 			alu_result <= '0;
 			result_ready <= 0;
 		end else begin
-			if (alu_op == ALU_NONE) begin
+			if (id_ex_reg.alu_op == ALU_NONE) begin
 				alu_result <= '0;
 				result_ready <= 0;
-			end else if (alu_op == ALU_ADD) begin
-				alu_result <=  input_a_is_immediate? immediate + regfile_rd1_data : 0;
+			end else if (id_ex_reg.alu_op == ALU_ADD) begin
+				alu_result <=  id_ex_reg.input_a_is_immediate? id_ex_reg.inst_imm + regfile_rd1_data : 0;
 				result_ready <= 1;
 			end else begin
 				alu_result <= 'hdeadbeef;

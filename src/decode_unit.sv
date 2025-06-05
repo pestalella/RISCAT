@@ -2,21 +2,13 @@
 `define __DECODE_UNIT_SV__
 
 `include "alu_enums.svh"
+`include "pipeline_stage_registers.sv"
 
 module decode_unit(
 	input logic clk,
 	input logic reset_n,
-	input	logic [31:0] fetched_inst,
-
-	output logic [4:0] reg_rd0_addr,
-	output logic [4:0] reg_rd1_addr,
-	output logic [4:0] reg_wr_addr,
-	output logic reg_rd0_en,
-	output logic reg_rd1_en,
-	output logic reg_wr_en,
-	output logic input_a_is_immediate,
-	output logic [11:0] inst_imm,
-	output alu_command_t alu_op
+	input IF_ID if_id_reg,
+	output ID_EX id_ex_reg
 );
 
 	bit is_reg_imm_inst;
@@ -29,8 +21,8 @@ module decode_unit(
 	bit is_ori;
 	bit is_andi;
 
-	assign is_reg_imm_inst = fetched_inst[6:0] == 7'b0010011;
-	assign inst_f3 = fetched_inst[14:12];
+	assign is_reg_imm_inst = if_id_reg.fetched_inst[6:0] == 7'b0010011;
+	assign inst_f3 = if_id_reg.fetched_inst[14:12];
 
 	assign is_addi  = is_reg_imm_inst && (inst_f3 == 'b000);
 	assign is_slti  = is_reg_imm_inst && (inst_f3 == 'b010);
@@ -41,32 +33,24 @@ module decode_unit(
 
 	always @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
-			reg_rd0_addr <= 0;
-			reg_rd1_addr <= 0;
-			reg_wr_addr <= 0;
-			reg_rd0_en <= 0;
-			reg_rd1_en <= 0;
-			reg_wr_en <= 0;
-			input_a_is_immediate <= 0;
-			inst_imm <= 0;
-			alu_op <= ALU_NONE;
+			id_ex_reg <= '{default:0};
 		end else begin
-			reg_rd0_addr <= 0;
-			reg_rd1_addr <= is_reg_imm_inst? fetched_inst[19:15] : 0;
-			reg_wr_addr <= is_reg_imm_inst? fetched_inst[11:7] : 0;
-			reg_rd0_en <= 0;
-			reg_rd1_en <= is_reg_imm_inst;
-			reg_wr_en <= is_reg_imm_inst;
-			input_a_is_immediate <= is_reg_imm_inst;
-			inst_imm <= is_reg_imm_inst? fetched_inst[31:20] : 0;
-			alu_op <= is_addi? ALU_ADD : (
-								is_slti? ALU_SLT : (
-								is_sltiu? ALU_SLTU : (
-								is_xori? ALU_XOR : (
-								is_ori? ALU_OR : (
-								is_andi? ALU_AND :
-								ALU_NONE
-								)))));
+			id_ex_reg.reg_rd0_addr <= 0;
+			id_ex_reg.reg_rd1_addr <= is_reg_imm_inst? if_id_reg.fetched_inst[19:15] : 0;
+			id_ex_reg.reg_wr_addr <= is_reg_imm_inst? if_id_reg.fetched_inst[11:7] : 0;
+			id_ex_reg.reg_rd0_en <= 0;
+			id_ex_reg.reg_rd1_en <= is_reg_imm_inst;
+			id_ex_reg.reg_wr_en <= is_reg_imm_inst;
+			id_ex_reg.input_a_is_immediate <= is_reg_imm_inst;
+			id_ex_reg.inst_imm <= is_reg_imm_inst? if_id_reg.fetched_inst[31:20] : 0;
+			id_ex_reg.alu_op <= is_addi? ALU_ADD : (
+													is_slti? ALU_SLT : (
+													is_sltiu? ALU_SLTU : (
+													is_xori? ALU_XOR : (
+													is_ori? ALU_OR : (
+													is_andi? ALU_AND :
+													ALU_NONE
+													)))));
 		end
 	end
 endmodule
