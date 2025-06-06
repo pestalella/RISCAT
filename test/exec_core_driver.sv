@@ -36,8 +36,8 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				exec_core_message action_received;
 				reg_imm_instruction inst = new(ADDI);
 
-				`uvm_info(get_type_name(), "GOT ADDI, WAITING FOR vif.rd_ram_en", UVM_MEDIUM)
-				`uvm_info(get_type_name(), $sformatf("Got vif.rd_ram_en, injecting ADDI instruction:\n%s", inst.sprint()), UVM_MEDIUM)
+				// `uvm_info(get_type_name(), "GOT ADDI, WAITING FOR vif.rd_ram_en", UVM_MEDIUM)
+				// `uvm_info(get_type_name(), $sformatf("Got vif.rd_ram_en, injecting ADDI instruction:\n%s", inst.sprint()), UVM_MEDIUM)
 				vif.rd_ram_data <= inst.encoded();
 
 				action_received = exec_core_message::type_id::create("action_received", this);

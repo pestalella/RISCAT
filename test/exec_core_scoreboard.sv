@@ -37,22 +37,28 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.src] + tx.imm;
 			expected_reg_inputs[tx.src] = tx.reg_wr_data;
 			transactions.push_back(tx);  // saved for later check
+			`uvm_info(get_type_name(), $sformatf("stored transactions: %d", transactions.size()), UVM_MEDIUM)
+
 
 		end else if (tx.m_action == REG_WR) begin
 			exec_core_message saved_transaction = transactions.pop_front();
 			`uvm_info(get_type_name(), $sformatf("received a RegisterWrite action:\n%s\nsaved_transaciont:\n%s\n", tx.sprint(), saved_transaction.sprint()), UVM_MEDIUM)
+			if (tx.dest == 0) begin
+				`uvm_info(get_type_name, "Ignoring write to r0", UVM_MEDIUM)
+			end else begin
+				assert (tx.dest == saved_transaction.dest) else
+					`uvm_fatal(get_type_name(),
+						$sformatf("received a write to r%1d, was expecting a write to r%1d", tx.dest, saved_transaction.dest))
 
-			assert (tx.dest == saved_transaction.dest) else
-				`uvm_error(get_type_name(),
-					$sformatf("received a write to r%1d, was expecting a write to r%1d", tx.dest, saved_transaction.dest))
-
-			assert (tx.reg_wr_data == saved_transaction.reg_wr_data)
-				regfile_copy[tx.dest] = saved_transaction.reg_wr_data;
-			else
-				`uvm_error(get_type_name(),
-					$sformatf("received a write to r%1d, expected value was %0h, received %0h instead",
-						tx.dest, saved_transaction.reg_wr_data, tx.reg_wr_data))
+				assert (tx.reg_wr_data == saved_transaction.reg_wr_data)
+					regfile_copy[tx.dest] = saved_transaction.reg_wr_data;
+				else
+					`uvm_error(get_type_name(),
+						$sformatf("received a write to r%1d, expected value was %0h, received %0h instead",
+							tx.dest, saved_transaction.reg_wr_data, tx.reg_wr_data))
+			end
 		end
   endfunction
 
 endclass
+

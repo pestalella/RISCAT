@@ -3,6 +3,7 @@
 `include "register32bit_file.sv"
 `include "fetch_unit.sv"
 `include "decode_unit.sv"
+`include "writeback_unit.sv"
 `include "alu.sv"
 `include "pipeline_stage_registers.sv"
 
@@ -31,7 +32,7 @@ module exec_unit (
   wire [31:0] reg_wr_data;
 
   logic [31:0] alu_result;
- logic [31:0] reg_store_wr_data;
+ 	logic [31:0] reg_store_wr_data;
 
 	// always read a new instruction
 	assign exec_if.rd_ram_en = 1;
@@ -58,10 +59,6 @@ module exec_unit (
 		end
 	end
 
-	logic fetch_started;
-	logic fetch_completed;
-	wire [31:0] fetched_inst;
-
 	IF_ID if_id_reg;
 	ID_EX id_ex_reg;
 
@@ -87,12 +84,8 @@ module exec_unit (
 	assign regfile_interface.rd0_addr = id_ex_reg.reg_rd0_addr;
 	assign regfile_interface.rd1_en 	= id_ex_reg.reg_rd1_en;
 	assign regfile_interface.rd1_addr = id_ex_reg.reg_rd1_addr;
-	assign regfile_interface.wr_en 		= id_ex_reg.reg_wr_en & alu_result_ready;
-	assign regfile_interface.wr_addr 	= id_ex_reg.reg_wr_addr;
 	assign regfile_rd0_data 					= regfile_interface.rd0_data;
 	assign regfile_rd1_data 					= regfile_interface.rd1_data;
-	assign regfile_interface.wr_data 	= reg_store_wr_data;
-
 
 	alu_stage arithmetic_logic_unit(
 		.clk(exec_if.clk),
@@ -105,25 +98,17 @@ module exec_unit (
 	);
 	assign reg_store_wr_data = alu_result;
 
-endmodule
+	writeback_unit wb_stage(
+		.clk(clk),
+		.reset_n(reset_n),
+		.result_ready(alu_result_ready),
+		.alu_result(alu_result),
+		.wr_addr(id_ex_reg.reg_wr_addr),
 
-
-module register_store(
-	input logic result_ready,
-	input logic [31:0] alu_result,
-	input logic decode_reg_wr_en,
-	input logic [4:0] decode_reg_wr_addr,
-
-	output logic [4:0] reg_wr_addr,
-	output logic [31:0] reg_wr_data,
-	output logic reg_wr_en
-);
-
-always @(result_ready) begin
-	reg_wr_addr <= decode_reg_wr_addr;
-	reg_wr_data <= alu_result;
-	reg_wr_en <=  decode_reg_wr_en;
-end
+		.reg_wr_en(regfile_interface.wr_en),
+		.reg_wr_addr(regfile_interface.wr_addr),
+		.wr_data(regfile_interface.wr_data)
+	);
 
 endmodule
 
