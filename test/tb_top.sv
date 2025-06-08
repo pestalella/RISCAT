@@ -4,8 +4,6 @@
 `timescale 1ns / 1ns
 
 `include "uvm_macros.svh"
-//`include "exec_core_pkg.sv"
-//`include "mem_pkg.sv"
 `include "exec_core_tests.sv"
 `include "register_file_probe_if.sv"
 `include "../src/execution_unit.sv"
@@ -30,13 +28,7 @@ module top;
 
 
   register_file_probe_wrapper probe_wrapper(.clk(clk));
-
-	// bind tb_top.exec_core.registers register_file_probe_if register_file_probe_inst(
-	// 	.clk(reg_if.clk),
-	// 	.wr_en(reg_if.wr_en),
-	// 	.wr_addr(reg_if.wr_addr),
-	// 	.wr_data(reg_if.wr_data)
-	// );
+  exec_unit_probe_wrapper exec_probe_wrapper(.clk(clk));
 
 	// memsys_if memory_interface();
 
@@ -52,21 +44,18 @@ module top;
 	// assign memory_interface.wr_addr = wr_mem_addr;
 	// assign memory_interface.wr_data = wr_mem_data;
 
-	exec_unit_if exec_if(
-		.clk(clk),
-		.reset_n(reset_n)
-	);
-
 	exec_unit exec_core(
-		.exec_if(exec_if)
-	);
+		.clk(clk),
+		.reset_n(reset_n),
 
-	assign rd_mem_en = exec_if.rd_ram_en;
-	assign rd_mem_addr = exec_if.rd_ram_addr;
-	assign exec_if.rd_ram_data = rd_mem_data;
-	assign exec_if.wr_ram_en = wr_mem_en;
-	assign exec_if.wr_ram_addr = wr_mem_addr;
-	assign exec_if.wr_ram_data = wr_mem_data;
+		.rd_ram_data(rd_mem_data),
+		.wr_ram_en(wr_mem_en),
+		.wr_ram_addr(wr_mem_addr),
+		.wr_ram_data(wr_mem_data),
+
+		.rd_ram_en(rd_mem_en),
+		.rd_ram_addr(rd_mem_addr)
+	);
 
 	initial
 	begin
@@ -79,8 +68,6 @@ module top;
 		$timeformat(-9, 0, " ns", 5); //$timeformat( units_number , precision_number , suffix_string , minimum_field_width )
 		//run_test("mem_test");
 		//run_test("registerfile_test");
-		//uvm_config_db #(virtual memsys_if)::set(null, "*", "mem_if", memory_interface);
-		uvm_config_db #(virtual exec_unit_if)::set(null, "*", "exec_unit_if", exec_if);
 		run_test("exec_core_reset");
 	end
 

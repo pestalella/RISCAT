@@ -14,17 +14,19 @@ module writeback_unit(
 
 	output logic reg_wr_en,
 	output logic [4:0] reg_wr_addr,
-	output logic [31:0] wr_data
+	output logic [31:0] reg_wr_data
 );
 
 	always @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
+			reg_wr_en <= 0;
 			reg_wr_addr <= 0;
-			wr_data <= 0;
+			reg_wr_data <= 0;
 		end else begin
 			if (result_ready) begin
+				reg_wr_en <= 1;
 				reg_wr_addr <= wr_addr;
-				wr_data <= alu_result;
+				reg_wr_data <= alu_result;
 			end
 		end
 	end

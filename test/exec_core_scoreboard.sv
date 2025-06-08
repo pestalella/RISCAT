@@ -42,6 +42,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
 
 		end else if (tx.m_action == REG_WR) begin
 			exec_core_message saved_transaction = transactions.pop_front();
+			`uvm_info(get_type_name(), $sformatf("stored transactions: %d", transactions.size()), UVM_MEDIUM)
 			`uvm_info(get_type_name(), $sformatf("received a RegisterWrite action:\n%s\nsaved_transaciont:\n%s\n", tx.sprint(), saved_transaction.sprint()), UVM_MEDIUM)
 			if (tx.dest == 0) begin
 				`uvm_info(get_type_name, "Ignoring write to r0", UVM_MEDIUM)

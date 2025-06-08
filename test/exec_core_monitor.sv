@@ -1,9 +1,10 @@
+`include "exec_unit_probe_if.sv"
 
 class exec_core_monitor extends uvm_monitor;
 
 	`uvm_component_utils(exec_core_monitor)
 
-	virtual exec_unit_if execunit_vif;
+	virtual exec_unit_probe_if execunit_vif;
 	virtual register_file_probe_if regfile_vif;
 
 	uvm_analysis_port #(exec_core_message) m_ap;
@@ -15,8 +16,8 @@ class exec_core_monitor extends uvm_monitor;
 	function void build_phase(uvm_phase phase);
 		`uvm_info(get_type_name(), "build_phase", UVM_MEDIUM)
 		m_ap = new("m_ap", this);
-		if( !uvm_config_db #(virtual exec_unit_if)::get(this, "", "exec_unit_if", execunit_vif) )
-		 	`uvm_error(get_type_name(), "No exec_unit_if found in uvm_config_db")
+		if( !uvm_config_db #(virtual exec_unit_probe_if)::get(this, "", "exec_unit_probe_if", execunit_vif) )
+		 	`uvm_error(get_type_name(), "No exec_unit_probe_if found in uvm_config_db")
 		if( !uvm_config_db #(virtual register_file_probe_if)::get(this, "", "register_file_probe_if", regfile_vif) )
 			`uvm_error(get_type_name(), "No register_file_probe_if found in uvm_config_db")
 	endfunction
@@ -28,6 +29,7 @@ class exec_core_monitor extends uvm_monitor;
 			exec_core_message tx;
 			@(posedge execunit_vif.clk);
 			if (!execunit_vif.reset_n) begin
+				`uvm_info(get_type_name(), "Detected a reset", UVM_MEDIUM);
 				tx = exec_core_message::type_id::create("tx", this);
 				tx.m_action  = RESET;
 				m_ap.write(tx);

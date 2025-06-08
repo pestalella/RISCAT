@@ -7,46 +7,28 @@
 `include "alu.sv"
 `include "pipeline_stage_registers.sv"
 
-interface exec_unit_if(
-	input logic clk,
-	output logic reset_n
-);
-
-	wire rd_ram_en;
-	logic [31:0] rd_ram_addr;
-	logic [31:0] rd_ram_data;
-	wire wr_ram_en;
-	logic [31:0] wr_ram_addr;
-	logic [31:0] wr_ram_data;
-
-endinterface
 
 module exec_unit (
-		exec_unit_if exec_if
+	input logic clk,
+	output logic reset_n,
+
+	output wire rd_ram_en,
+	output logic [31:0] rd_ram_addr,
+	input logic [31:0] rd_ram_data,
+
+	output wire wr_ram_en,
+	output logic [31:0] wr_ram_addr,
+	input logic [31:0] wr_ram_data
 );
 
   logic [31:0] pc;
 
-	wire [31:0] regfile_rd0_data;
-	wire [31:0] regfile_rd1_data;
-  wire [31:0] reg_wr_data;
-
-  logic [31:0] alu_result;
- 	logic [31:0] reg_store_wr_data;
-
 	// always read a new instruction
-	assign exec_if.rd_ram_en = 1;
-
-	regfile_if regfile_interface();
-	logic alu_result_ready;
-
-	register32bit_file registers(
-		.reg_if(regfile_interface)
-	);
+	assign rd_ram_en = 1;
 
 	// Update program counter
-	always @(posedge exec_if.clk) begin
-			if (!exec_if.reset_n) begin
+	always @(posedge clk) begin
+			if (!reset_n) begin
 					pc  <= 0;
 			end else begin
 					pc  <= pc + 4;
@@ -54,60 +36,72 @@ module exec_unit (
 	end
 
 	// Clear internal data on reset
-  always @(posedge exec_if.clk) begin
-    if (!exec_if.reset_n) begin
+  always @(posedge clk) begin
+    if (!reset_n) begin
 		end
 	end
 
 	IF_ID if_id_reg;
 	ID_EX id_ex_reg;
+	EX_WB ex_wb_reg;
+
+// ######################################
+// ###### INSERT PC INTO if_id_req ######
+// ######################################
+	logic wb_wr_en;
+  logic [4:0] wb_wr_addr;
+  logic [31:0] wb_wr_data;
+
+
+	register32bit_file registers(
+		.clk(clk),
+		.reset_n(reset_n),
+		.rd0_en(id_ex_reg.reg_rd0_en),
+		.rd0_addr(id_ex_reg.reg_rd0_addr),
+		.rd0_data(id_ex_reg.alu_reg_input_a),
+		.rd1_en(id_ex_reg.reg_rd1_en),
+		.rd1_addr(id_ex_reg.reg_rd1_addr),
+		.rd1_data(id_ex_reg.alu_reg_input_b),
+		.wr_en(wb_wr_en),
+		.wr_addr(wb_wr_addr),
+		.wr_data(wb_wr_data)
+	);
 
 	fetch_stage instruction_fetch(
-		.clk(exec_if.clk),
-		.reset_n(exec_if.reset_n),
+		.clk(clk),
+		.reset_n(reset_n),
 		.pc(pc),
-		.rd_ram_addr(exec_if.rd_ram_addr),
-		.rd_ram_data(exec_if.rd_ram_data),
+		.rd_ram_addr(rd_ram_addr),
+		.rd_ram_data(rd_ram_data),
 		.if_id_reg(if_id_reg)
 	);
 
 	decode_unit instruction_decode(
-		.clk(exec_if.clk),
-		.reset_n(exec_if.reset_n),
+		.clk(clk),
+		.reset_n(reset_n),
 		.if_id_reg(if_id_reg),
 		.id_ex_reg(id_ex_reg)
 	);
 
-	assign regfile_interface.clk 			= exec_if.clk;
-	assign regfile_interface.reset_n 	= exec_if.reset_n;
-	assign regfile_interface.rd0_en 	= id_ex_reg.reg_rd0_en;
-	assign regfile_interface.rd0_addr = id_ex_reg.reg_rd0_addr;
-	assign regfile_interface.rd1_en 	= id_ex_reg.reg_rd1_en;
-	assign regfile_interface.rd1_addr = id_ex_reg.reg_rd1_addr;
-	assign regfile_rd0_data 					= regfile_interface.rd0_data;
-	assign regfile_rd1_data 					= regfile_interface.rd1_data;
-
 	alu_stage arithmetic_logic_unit(
-		.clk(exec_if.clk),
+		.clk(clk),
 		.reset_n(reset_n),
 		.id_ex_reg(id_ex_reg),
-		.regfile_rd0_data(regfile_rd0_data),
-		.regfile_rd1_data(regfile_rd1_data),
-		.result_ready(alu_result_ready),
-		.alu_result(alu_result)
+		.ex_wb_reg(ex_wb_reg)
 	);
-	assign reg_store_wr_data = alu_result;
+
+//	assign reg_store_wr_data = ex_wb_reg.alu_result;
 
 	writeback_unit wb_stage(
 		.clk(clk),
 		.reset_n(reset_n),
-		.result_ready(alu_result_ready),
-		.alu_result(alu_result),
-		.wr_addr(id_ex_reg.reg_wr_addr),
+		.result_ready(ex_wb_reg.alu_result_ready),
+		.alu_result(ex_wb_reg.alu_result),
+		.wr_addr(ex_wb_reg.reg_wr_addr),
 
-		.reg_wr_en(regfile_interface.wr_en),
-		.reg_wr_addr(regfile_interface.wr_addr),
-		.wr_data(regfile_interface.wr_data)
+		.reg_wr_en(wb_wr_en),
+		.reg_wr_addr(wb_wr_addr),
+		.reg_wr_data(wb_wr_data)
 	);
 
 endmodule

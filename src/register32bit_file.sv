@@ -4,39 +4,34 @@
 `include "muxers.sv"
 `include "register32bit.sv"
 
-interface regfile_if;
-
-	logic clk;
-	logic reset_n;
-	// register reading
-	logic rd0_en;
-	logic [4:0] rd0_addr;
-	logic [31:0] rd0_data;
-	// register reading
-	logic rd1_en;
-	logic [4:0] rd1_addr;
-	logic [31:0] rd1_data;
-	// register writing
-	logic wr_en;
-	logic [4:0] wr_addr;
-	logic [31:0] wr_data;
-
-endinterface
-
 module register32bit_file (
-		regfile_if reg_if
+	input logic clk,
+	input logic reset_n,
+	// register reading
+	input logic rd0_en,
+	input logic [4:0] rd0_addr,
+	output logic [31:0] rd0_data,
+	// register reading
+	input logic rd1_en,
+	input logic [4:0] rd1_addr,
+	output logic [31:0] rd1_data,
+	// register writing
+	input logic wr_en,
+	input logic [4:0] wr_addr,
+	input logic [31:0] wr_data
+//		regfile_if reg_if
 	);
 
 	wire [31:0][31:0] r_data_out0;
 	wire [31:0][31:0] r_data_out1;
 	wire [31:0][31:0] r_data_in;
-	logic [31:0] rd0_data;
-	logic [31:0] rd1_data;
+	logic [31:0] rd0_data_r;
+	logic [31:0] rd1_data_r;
 
-	assign rd0_data = reg_if.rd0_en? reg_if.rd0_data : '0;
-	assign rd1_data = reg_if.rd1_en? reg_if.rd1_data : '0;
+	assign rd0_data = rd0_en? rd0_data_r : '0;
+	assign rd1_data = rd1_en? rd1_data_r : '0;
 
-	mux32to1 rd0_mux(.sel(reg_if.rd0_addr),
+	mux32to1 rd0_mux(.sel(rd0_addr),
 										.in0(0),
 										.in1(r_data_out0[1]),
 										.in2(r_data_out0[2]),
@@ -69,9 +64,9 @@ module register32bit_file (
 										.in29(r_data_out0[29]),
 										.in30(r_data_out0[30]),
 										.in31(r_data_out0[31]),
-										.out(reg_if.rd0_data));
+										.out(rd0_data_r));
 
-	mux32to1 rd1_mux(.sel(reg_if.rd1_addr),
+	mux32to1 rd1_mux(.sel(rd1_addr),
 										.in0(0),
 										.in1(r_data_out1[1]),
 										.in2(r_data_out1[2]),
@@ -104,10 +99,10 @@ module register32bit_file (
 										.in29(r_data_out1[29]),
 										.in30(r_data_out1[30]),
 										.in31(r_data_out1[31]),
-										.out(reg_if.rd1_data));
+										.out(rd1_data_r));
 
-	demux1to32 wr_demux(.sel(reg_if.wr_addr),
-											.in(reg_if.wr_data),
+	demux1to32 wr_demux(.sel(wr_addr),
+											.in(wr_data),
 											//.out0('Z),  //leave unconnected
 											.out1(r_data_in[1]),
 											.out2(r_data_in[2]),
@@ -145,14 +140,14 @@ module register32bit_file (
 	genvar i;
 	for (i = 1; i < 32; i++) begin : regs   // r0 is just 0
 			register32bit r(
-					.clk(reg_if.clk),
-					.reset_n(reg_if.reset_n),
+					.clk(clk),
+					.reset_n(reset_n),
 					.data_in(r_data_in[i]),
 					.data_out0(r_data_out0[i]),
 					.data_out1(r_data_out1[i]),
-					.load((reg_if.wr_addr == i) && reg_if.wr_en),
-					.out0_en((reg_if.rd0_addr == i) && reg_if.rd0_en),
-					.out1_en((reg_if.rd1_addr == i) && reg_if.rd1_en)
+					.load((wr_addr == i) && wr_en),
+					.out0_en((rd0_addr == i) && rd0_en),
+					.out1_en((rd1_addr == i) && rd1_en)
 					);
 	end
 

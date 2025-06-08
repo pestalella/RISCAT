@@ -20,20 +20,18 @@ interface register_file_probe_if(
 
 endinterface
 
-
-bind top.exec_core register_file_probe_if register_file_probe_inst(
-	.clk(regfile_interface.clk),
-	.wr_en(regfile_interface.wr_en),
-	.wr_addr(regfile_interface.wr_addr),
-	.wr_data(regfile_interface.wr_data)
+bind top.exec_core.registers register_file_probe_if register_file_probe_inst(
+	.clk(clk),
+	.wr_en(wr_en),
+	.wr_addr(wr_addr),
+	.wr_data(wr_data)
 );
 
 module register_file_probe_wrapper(
   input logic clk
 );
-
   initial begin
-		uvm_config_db #(virtual register_file_probe_if)::set(null, "*", "register_file_probe_if", top.exec_core.register_file_probe_inst);
+		uvm_config_db #(virtual register_file_probe_if)::set(null, "*", "register_file_probe_if", top.exec_core.registers.register_file_probe_inst);
 	end
 endmodule
 

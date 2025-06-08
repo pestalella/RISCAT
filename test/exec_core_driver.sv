@@ -1,11 +1,12 @@
 `include "../src/r32i_isa.svh"
 `include "exec_core_action.sv"
+`include "exec_unit_probe_if.sv"
 
 class exec_core_driver extends uvm_driver #(exec_core_transaction);
 
 	`uvm_component_utils(exec_core_driver)
 
-	virtual exec_unit_if vif;
+	virtual exec_unit_probe_if vif;
 	uvm_analysis_port #(exec_core_message) m_ap;
 
 	function new(string name, uvm_component parent);
@@ -14,7 +15,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 
 	function void build_phase(uvm_phase phase);
 		`uvm_info(get_type_name(), "build_phase in exec_core_driver", UVM_MEDIUM)
-		if( !uvm_config_db #(virtual exec_unit_if)::get(this, "", "exec_unit_if", vif) )
+		if( !uvm_config_db #(virtual exec_unit_probe_if)::get(this, "", "exec_unit_probe_if", vif) )
 			`uvm_error(get_type_name(), "uvm_config_db::get failed")
 		m_ap = new("m_ap", this);
 	endfunction
@@ -35,6 +36,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 			begin
 				exec_core_message action_received;
 				reg_imm_instruction inst = new(ADDI);
+				inst.randomize() with {src == 1; dest == 1;};
 
 				// `uvm_info(get_type_name(), "GOT ADDI, WAITING FOR vif.rd_ram_en", UVM_MEDIUM)
 				// `uvm_info(get_type_name(), $sformatf("Got vif.rd_ram_en, injecting ADDI instruction:\n%s", inst.sprint()), UVM_MEDIUM)
