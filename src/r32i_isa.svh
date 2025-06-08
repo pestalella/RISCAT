@@ -12,9 +12,6 @@ class reg_imm_instruction;
 
 	function new(instruction inst);
 		if (inst == ADDI) begin
-			randomize(imm);
-			randomize(src);
-			randomize(dest);
 			inst_sel = 3'b000;
 			opcode = 7'b0010011;
 		end
