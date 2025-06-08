@@ -3,7 +3,7 @@
 
 `include "pipeline_stage_registers.sv"
 
-module fetch_stage(
+module fetch_unit(
 	input logic clk,
 	input logic reset_n,
 	input logic [31:0] pc,
@@ -22,6 +22,7 @@ module fetch_stage(
 		end else begin
 				rd_ram_addr <= pc;
 				fetched_inst_r <= rd_ram_data;
+				if_id_reg.pc <= pc;
 		end
 	end
 

@@ -67,7 +67,7 @@ module exec_unit (
 		.wr_data(wb_wr_data)
 	);
 
-	fetch_stage instruction_fetch(
+	fetch_unit instruction_fetch(
 		.clk(clk),
 		.reset_n(reset_n),
 		.pc(pc),
