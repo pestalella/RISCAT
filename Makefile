@@ -17,7 +17,7 @@ elab:
 	$(XELAB) --debug typical --relax --mt 8 -cov_db_name cov_db -cov_db_dir coverage -cc_type sbct -L xil_defaultlib -L uvm -L unisims_ver -L unimacro_ver -L secureip --snapshot top_behav xil_defaultlib.top xil_defaultlib.glbl -log elaborate.log
 
 clean:
-	rm -rf xsim.dir
+	rm -rf xsim.dir RISCAT.sim
 
 simulate:
 	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):$(VIVADO_LIB_PATH); \
