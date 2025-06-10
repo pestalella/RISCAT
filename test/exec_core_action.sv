@@ -11,6 +11,7 @@ import uvm_pkg::*;
 class exec_core_message extends uvm_sequence_item;
 
 	exec_core_action m_action;
+	bit[31:0] pc;
 	bit[11:0] imm;
 	bit[4:0] src;
 	bit[4:0] dest;
@@ -20,8 +21,13 @@ class exec_core_message extends uvm_sequence_item;
 		super.new(name);
 	endfunction
 
+	function string to_asm_string();
+		return $sformatf("r%1d = r%1d + %1d", dest, src, imm);
+	endfunction
+
 	`uvm_object_utils_begin(exec_core_message)
 		`uvm_field_enum(exec_core_action, m_action, UVM_DEFAULT)
+		`uvm_field_int(pc, UVM_DEFAULT|UVM_HEX)
 		`uvm_field_int(imm, UVM_DEFAULT|UVM_HEX)
 		`uvm_field_int(src, UVM_DEFAULT)
 		`uvm_field_int(dest, UVM_DEFAULT)

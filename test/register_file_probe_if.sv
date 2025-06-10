@@ -6,6 +6,7 @@ import uvm_pkg::*;
 
 interface register_file_probe_if(
   input logic clk,
+	input logic [31:0] pc,
   input logic wr_en,
   input logic [4:0] wr_addr,
   input logic [31:0] wr_data);
@@ -20,18 +21,19 @@ interface register_file_probe_if(
 
 endinterface
 
-bind top.exec_core.registers register_file_probe_if register_file_probe_inst(
+bind top.exec_core register_file_probe_if register_file_probe_inst(
 	.clk(clk),
-	.wr_en(wr_en),
-	.wr_addr(wr_addr),
-	.wr_data(wr_data)
+	.pc(ex_wb_reg.pc),
+	.wr_en(registers.wr_en),
+	.wr_addr(registers.wr_addr),
+	.wr_data(registers.wr_data)
 );
 
 module register_file_probe_wrapper(
   input logic clk
 );
   initial begin
-		uvm_config_db #(virtual register_file_probe_if)::set(null, "*", "register_file_probe_if", top.exec_core.registers.register_file_probe_inst);
+		uvm_config_db #(virtual register_file_probe_if)::set(null, "*", "register_file_probe_if", top.exec_core.register_file_probe_inst);
 	end
 endmodule
 

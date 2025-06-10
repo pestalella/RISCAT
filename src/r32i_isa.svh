@@ -18,9 +18,11 @@ class reg_imm_instruction;
 	endfunction
 
 	function string sprint();
-		return $sformatf(
-			"------------------------------\n- Instruction -\n------------------------------\n  opcode:\t%07b\n  sel:\t%03b\n  src:\t%d\n  dest:\t%d\n  imm:\t%d\n------------------------------",
-			opcode, inst_sel, src, dest,  imm);
+		return $sformatf("r%1d = r%1d + %1d", dest, src, imm);
+
+		// return $sformatf(
+		// 	"------------------------------\n- Instruction -\n------------------------------\n  opcode:\t%07b\n  sel:\t%03b\n  src:\t%d\n  dest:\t%d\n  imm:\t%d\n------------------------------",
+		// 	opcode, inst_sel, src, dest,  imm);
 	endfunction
 
 	function bit[31:0] encoded();

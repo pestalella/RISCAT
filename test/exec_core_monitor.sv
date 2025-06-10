@@ -34,42 +34,17 @@ class exec_core_monitor extends uvm_monitor;
 				tx.m_action  = RESET;
 				m_ap.write(tx);
 			end else if (regfile_vif.wr_en) begin
-				`uvm_info(get_type_name(), $sformatf("Detected a register file write. r%1d = %1h", regfile_vif.wr_addr, regfile_vif.wr_data), UVM_MEDIUM);
+				`uvm_info(get_type_name(),
+					$sformatf("Detected a register file write. r%1d = %1d",
+						regfile_vif.wr_addr, regfile_vif.wr_data),
+					UVM_MEDIUM);
 				tx = exec_core_message::type_id::create("tx", this);
 				tx.m_action  = REG_WR;
+				tx.pc = regfile_vif.pc;
 				tx.dest = regfile_vif.wr_addr;
 				tx.reg_wr_data = regfile_vif.wr_data;
 				m_ap.write(tx);
 			end
-			// 	tx = exec_core_transaction::type_id::create("tx", this);
-			// 	tx.cmd  = READ_MEM;
-			// 	tx.rd0_addr = vif.rd0_addr;
-			// 	tx.rd0_data = vif.rd0_data;
-			// 	m_ap.write(tx);
-			// end
-			// else if (!vif.rd0_en && vif.rd1_en) begin
-			// 	tx = exec_core_transaction::type_id::create("tx", this);
-			// 	tx.cmd  = READB;
-			// 	tx.rd1_addr = vif.rd1_addr;k
-			// 	tx.rd1_data = vif.rd1_data;
-			// 	m_ap.write(tx);
-			// end
-			// else if (vif.rd0_en && vif.rd1_en) begin
-			// 	tx = exec_core_transaction::type_id::create("tx", this);
-			// 	tx.cmd  = READAB;
-			// 	tx.rd0_addr = vif.rd0_addr;
-			// 	tx.rd0_data = vif.rd0_data;
-			// 	tx.rd1_addr = vif.rd1_addr;
-			// 	tx.rd1_data = vif.rd1_data;
-			// 	m_ap.write(tx);
-			// end
-			// else if (vif.wr_en) begin
-			// 	tx = exec_core_transaction::type_id::create("tx", this);
-			// 	tx.cmd  = WRITE;
-			// 	tx.wr_addr = vif.wr_addr;
-			// 	tx.wr_data = vif.wr_data;
-			// 	m_ap.write(tx);
-			// end
 		end
 	endtask
 

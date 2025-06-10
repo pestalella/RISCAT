@@ -7,6 +7,7 @@ import uvm_pkg::*;
 interface exec_unit_probe_if(
   input logic clk,
   output logic reset_n,
+	input logic [31:0] rd_ram_addr,
   output logic [31:0] rd_ram_data);
 endinterface
 
@@ -14,6 +15,7 @@ endinterface
 bind top.exec_core exec_unit_probe_if exec_unit_probe_inst(
 	.clk(clk),
 	.reset_n(reset_n),
+	.rd_ram_addr(rd_ram_addr),
 	.rd_ram_data(rd_ram_data)
 );
 

@@ -18,7 +18,9 @@ module fetch_unit(
 
 	always @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
-				fetched_inst_r <= 0;
+				rd_ram_addr <= '{default:0};
+				fetched_inst_r <= '{default:0};
+				if_id_reg <= '{default:0};
 		end else begin
 				rd_ram_addr <= pc;
 				fetched_inst_r <= rd_ram_data;

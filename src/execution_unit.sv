@@ -27,7 +27,7 @@ module exec_unit (
 	assign rd_ram_en = 1;
 
 	// Update program counter
-	always @(posedge clk) begin
+	always @(posedge clk or negedge reset_n) begin
 			if (!reset_n) begin
 					pc  <= 0;
 			end else begin
@@ -36,36 +36,25 @@ module exec_unit (
 	end
 
 	// Clear internal data on reset
-  always @(posedge clk) begin
-    if (!reset_n) begin
-		end
-	end
+  // always @(posedge clk) begin
+  //   if (!reset_n) begin
+	// 	end
+	// end
 
 	IF_ID if_id_reg;
 	ID_EX id_ex_reg;
 	EX_WB ex_wb_reg;
 
-// ######################################
-// ###### INSERT PC INTO if_id_req ######
-// ######################################
 	logic wb_wr_en;
   logic [4:0] wb_wr_addr;
   logic [31:0] wb_wr_data;
 
+	logic [31:0] regfile_rd0;
+	logic [31:0] regfile_rd1;
 
-	register32bit_file registers(
-		.clk(clk),
-		.reset_n(reset_n),
-		.rd0_en(id_ex_reg.reg_rd0_en),
-		.rd0_addr(id_ex_reg.reg_rd0_addr),
-		.rd0_data(id_ex_reg.alu_reg_input_a),
-		.rd1_en(id_ex_reg.reg_rd1_en),
-		.rd1_addr(id_ex_reg.reg_rd1_addr),
-		.rd1_data(id_ex_reg.alu_reg_input_b),
-		.wr_en(wb_wr_en),
-		.wr_addr(wb_wr_addr),
-		.wr_data(wb_wr_data)
-	);
+	logic raw_hazard_0;
+	logic raw_hazard_1;
+
 
 	fetch_unit instruction_fetch(
 		.clk(clk),
@@ -76,6 +65,11 @@ module exec_unit (
 		.if_id_reg(if_id_reg)
 	);
 
+	always_ff @(posedge clk) begin
+		raw_hazard_1 <= ((if_id_reg.fetched_inst[11:7] != 0) && (id_ex_reg.reg_wr_addr == if_id_reg.fetched_inst[19:15]));
+		raw_hazard_0 <= 0;
+	end
+
 	decode_unit instruction_decode(
 		.clk(clk),
 		.reset_n(reset_n),
@@ -83,14 +77,38 @@ module exec_unit (
 		.id_ex_reg(id_ex_reg)
 	);
 
+	register32bit_file registers(
+		.clk(clk),
+		.reset_n(reset_n),
+		.rd0_en(id_ex_reg.reg_rd0_en),
+		.rd0_addr(id_ex_reg.reg_rd0_addr),
+		.rd0_data(regfile_rd0),
+		.rd1_en(id_ex_reg.reg_rd1_en),
+		.rd1_addr(id_ex_reg.reg_rd1_addr),
+		.rd1_data(regfile_rd1),
+		.wr_en(wb_wr_en),
+		.wr_addr(wb_wr_addr),
+		.wr_data(wb_wr_data)
+	);
+
+	wire [31:0] alu_reg_input_a;
+	wire [31:0] alu_reg_input_b;
+
+	// assign alu_reg_input_a = id_ex_reg.raw_hazard_0? ex_wb_reg.alu_result : regfile_rd0;
+	// assign alu_reg_input_b = id_ex_reg.raw_hazard_1? ex_wb_reg.alu_result : regfile_rd1;
+	assign alu_reg_input_a = raw_hazard_0? ex_wb_reg.alu_result : regfile_rd0;
+	assign alu_reg_input_b = raw_hazard_1? ex_wb_reg.alu_result : regfile_rd1;
+
 	alu_stage arithmetic_logic_unit(
 		.clk(clk),
 		.reset_n(reset_n),
 		.id_ex_reg(id_ex_reg),
+		.alu_reg_input_a(alu_reg_input_a),
+		.alu_reg_input_b(alu_reg_input_b),
 		.ex_wb_reg(ex_wb_reg)
+		// .alu_result(alu_result),
+		// .alu_result_ready(alu_result_ready)
 	);
-
-//	assign reg_store_wr_data = ex_wb_reg.alu_result;
 
 	writeback_unit wb_stage(
 		.clk(clk),

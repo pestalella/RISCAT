@@ -11,15 +11,15 @@ module decode_unit(
 	output ID_EX id_ex_reg
 );
 
-	bit is_reg_imm_inst;
-	bit [2:0] inst_f3;
+	logic is_reg_imm_inst;
+	logic [2:0] inst_f3;
 
-	bit is_addi;
-	bit is_slti;
-	bit is_sltiu;
-	bit is_xori;
-	bit is_ori;
-	bit is_andi;
+	logic is_addi;
+	logic is_slti;
+	logic is_sltiu;
+	logic is_xori;
+	logic is_ori;
+	logic is_andi;
 
 	assign is_reg_imm_inst = if_id_reg.fetched_inst[6:0] == 7'b0010011;
 	assign inst_f3 = if_id_reg.fetched_inst[14:12];
@@ -31,11 +31,23 @@ module decode_unit(
 	assign is_ori   = is_reg_imm_inst && (inst_f3 == 'b110);
 	assign is_andi  = is_reg_imm_inst && (inst_f3 == 'b111);
 
+	logic [4:0] next_rd0_addr;
+	logic [4:0] next_rd1_addr;
+
 	always @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
 			id_ex_reg <= '{default:0};
+			next_rd0_addr <= '{default:0};
+			next_rd1_addr <= '{default:0};
 		end else begin
-			id_ex_reg.reg_rd0_addr <= 0;
+			next_rd0_addr <= 0;
+			next_rd1_addr <= is_reg_imm_inst? if_id_reg.fetched_inst[19:15] : 0;
+
+			id_ex_reg.raw_hazard_0 <= (id_ex_reg.reg_wr_addr != 0 && id_ex_reg.reg_wr_addr == next_rd0_addr);
+			id_ex_reg.raw_hazard_1 <= (id_ex_reg.reg_wr_addr != 0 && id_ex_reg.reg_wr_addr == next_rd1_addr);
+
+			id_ex_reg.pc <= if_id_reg.pc;
+			id_ex_reg.reg_rd0_addr <= next_rd0_addr;
 			id_ex_reg.reg_rd1_addr <= is_reg_imm_inst? if_id_reg.fetched_inst[19:15] : 0;
 			id_ex_reg.reg_wr_addr <= is_reg_imm_inst? if_id_reg.fetched_inst[11:7] : 0;
 			id_ex_reg.reg_rd0_en <= 0;
