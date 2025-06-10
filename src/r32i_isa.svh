@@ -7,7 +7,7 @@ class reg_imm_instruction;
 	rand bit[11:0] imm;
 	rand bit[4:0] src;
 	bit[2:0] inst_sel;
-	rand bit[4:0] dest;
+	rand bit[4:0] dst;
 	bit [6:0] opcode;
 
 	function new(instruction inst);
@@ -18,7 +18,7 @@ class reg_imm_instruction;
 	endfunction
 
 	function string sprint();
-		return $sformatf("r%1d = r%1d + %1d", dest, src, imm);
+		return $sformatf("r%1d = r%1d + %1d", dst, src, imm);
 
 		// return $sformatf(
 		// 	"------------------------------\n- Instruction -\n------------------------------\n  opcode:\t%07b\n  sel:\t%03b\n  src:\t%d\n  dest:\t%d\n  imm:\t%d\n------------------------------",
@@ -26,7 +26,7 @@ class reg_imm_instruction;
 	endfunction
 
 	function bit[31:0] encoded();
-		return {>>{imm, src, inst_sel, dest, opcode}};
+		return {>>{imm, src, inst_sel, dst, opcode}};
 	endfunction
 endclass
 

@@ -7,6 +7,9 @@ import uvm_pkg::*;
 class exec_core_transaction extends uvm_sequence_item;
 
 	rand exec_core_cmd cmd;
+	rand bit[4:0] src;
+	rand bit[4:0] dst;
+	rand bit[11:0] imm;
 
 	function new (string name = "");
 		super.new(name);

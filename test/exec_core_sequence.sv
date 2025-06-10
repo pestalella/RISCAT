@@ -15,13 +15,13 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		// Perform an initial RESET to clean up the cpu state
 		`uvm_do_with(req, { req.cmd == CMD_RESET; })
 
-		repeat(100)
+		repeat(1000)
 		begin
-			if ($urandom_range(100) < 99) begin
+			// if ($urandom_range(100) < 99) begin
 				`uvm_do_with(req, { req.cmd == CMD_ADDI; })
-			end else begin
-				`uvm_do_with(req, { req.cmd == CMD_RESET; })
-			end
+			// end else begin
+			// 	`uvm_do_with(req, { req.cmd == CMD_RESET; })
+			// end
 		end
 	endtask: body
 

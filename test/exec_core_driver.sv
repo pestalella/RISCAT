@@ -39,9 +39,11 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				exec_core_message action_received;
 				reg_imm_instruction inst = new(ADDI);
 
+				inst.imm = req.imm;
+				inst.src = req.src;
+				inst.dst = req.dst;
+
 				@(posedge vif.clk);
-				inst.randomize() with {imm < 10; };
-//				inst.randomize() with {src == 1; dest == 1;};
 				`uvm_info(get_type_name(), $sformatf("Inj ADDI at PC=%04h: %s",
 					vif.rd_ram_addr, inst.sprint()), UVM_MEDIUM)
 
@@ -49,9 +51,9 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 
 				action_received = exec_core_message::type_id::create("action_received", this);
 				action_received.pc = vif.rd_ram_addr;
-				action_received.imm = inst.imm;
-				action_received.src = inst.src;
-				action_received.dest = inst.dest;
+				action_received.imm = req.imm;
+				action_received.src = req.src;
+				action_received.dest = req.dst;
 				action_received.m_action = INST_ADDI;
 				m_ap.write(action_received);
 

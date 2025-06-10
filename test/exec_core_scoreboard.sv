@@ -5,8 +5,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 
 	exec_core_message transactions[$];
 
-	bit [31:0] regfile_copy [4:0];
-	bit [31:0] expected_reg_inputs [4:0];
+	bit [31:0] regfile_copy [0:31];
+	bit [31:0] expected_reg_inputs [0:31];
 
 	`uvm_component_utils_begin(exec_core_scoreboard)
 		// `uvm_field_int(transaction_count, UVM_DEFAULT|UVM_DEC)
@@ -34,10 +34,14 @@ class exec_core_scoreboard extends uvm_scoreboard;
 		end else if (tx.m_action == INST_ADDI) begin
 //			`uvm_info(get_type_name(), $sformatf("received a ADDI action:\n%s", tx.to_asm_string()), UVM_MEDIUM)
 			tx.reg_wr_data = expected_reg_inputs[tx.src] + tx.imm;
-			// `uvm_info(get_type_name(), $sformatf("Expected r%1d value before: %1d. Expected value after: %1d",
-			// 	tx.), UVM_MEDIUM)
 			if (tx.dest != 0) begin
-				expected_reg_inputs[tx.dest] = tx.reg_wr_data;
+				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d)+%1d",
+				 	tx.dest, expected_reg_inputs[tx.dest], tx.src, expected_reg_inputs[tx.src], tx.imm), UVM_MEDIUM)
+
+				expected_reg_inputs[tx.dest] = expected_reg_inputs[tx.src] + tx.imm;
+
+				`uvm_info(get_type_name(), $sformatf("r%1d =%1d",
+				 	tx.dest, expected_reg_inputs[tx.dest]), UVM_MEDIUM)
 			end
 			`uvm_info(get_type_name, $sformatf("Saving transaction:\n%s", tx.sprint()), UVM_DEBUG)
 

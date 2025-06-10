@@ -26,7 +26,6 @@ module top;
 	wire rd_mem_en;
 	wire wr_mem_en;
 
-
   register_file_probe_wrapper probe_wrapper(.clk(clk));
   exec_unit_probe_wrapper exec_probe_wrapper(.clk(clk));
 
@@ -59,6 +58,7 @@ module top;
 
 	initial
 	begin
+		reset_n = 0;
 		clk = 0;
 		forever #5 clk = ~clk;
 	end
