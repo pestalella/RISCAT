@@ -1,3 +1,3 @@
 
-run 100000ns
+run 1000000ns
 quit

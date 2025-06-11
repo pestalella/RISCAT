@@ -94,8 +94,6 @@ module exec_unit (
 	wire [31:0] alu_reg_input_a;
 	wire [31:0] alu_reg_input_b;
 
-	// assign alu_reg_input_a = id_ex_reg.raw_hazard_0? ex_wb_reg.alu_result : regfile_rd0;
-	// assign alu_reg_input_b = id_ex_reg.raw_hazard_1? ex_wb_reg.alu_result : regfile_rd1;
 	assign alu_reg_input_a = raw_hazard_0? ex_wb_reg.alu_result : regfile_rd0;
 	assign alu_reg_input_b = raw_hazard_1? ex_wb_reg.alu_result : regfile_rd1;
 
@@ -106,8 +104,6 @@ module exec_unit (
 		.alu_reg_input_a(alu_reg_input_a),
 		.alu_reg_input_b(alu_reg_input_b),
 		.ex_wb_reg(ex_wb_reg)
-		// .alu_result(alu_result),
-		// .alu_result_ready(alu_result_ready)
 	);
 
 	writeback_unit wb_stage(

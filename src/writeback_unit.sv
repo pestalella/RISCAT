@@ -1,9 +1,6 @@
 `ifndef __WRITEBACK_STAGE_SV__
 `define __WRITEBACK_STAGE_SV__
 
-// `include "alu_enums.svh"
-// `include "pipeline_stage_registers.sv"
-
 module writeback_unit(
 	input logic clk,
 	input logic reset_n,

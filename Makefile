@@ -21,4 +21,4 @@ clean:
 
 simulate:
 	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):$(VIVADO_LIB_PATH); \
-	$(XSIM) top_behav -key Behavioral:sim_1:Functional:top  -log simulate.log -tclbatch top_sim.tcl
+	$(XSIM) top_behav -key Behavioral:sim_1:Functional:top -sv_seed 6 -log simulate.log -tclbatch top_sim.tcl

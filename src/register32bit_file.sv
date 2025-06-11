@@ -19,7 +19,6 @@ module register32bit_file (
 	input logic wr_en,
 	input logic [4:0] wr_addr,
 	input logic [31:0] wr_data
-//		regfile_if reg_if
 	);
 
 	wire [31:0] r_data_out0[0:31];

@@ -13,8 +13,6 @@ module alu_stage(
 	input logic [31:0] alu_reg_input_b,
 
 	output 	EX_WB ex_wb_reg
-	// output logic[31:0] alu_result,
-	// output logic alu_result_ready
 );
 
 	always @(posedge clk or negedge reset_n) begin

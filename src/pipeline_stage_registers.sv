@@ -18,9 +18,6 @@ typedef struct packed {
 	logic raw_hazard_0;
 	logic raw_hazard_1;
 
-	// logic [31:0] alu_reg_input_a;
-	// logic [31:0] alu_reg_input_b;
-
 	logic input_a_is_immediate;
 	logic [11:0] inst_imm;
 
