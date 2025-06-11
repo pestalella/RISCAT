@@ -22,11 +22,13 @@ module register32bit_file (
 //		regfile_if reg_if
 	);
 
-	wire [31:0][31:0] r_data_out0;
-	wire [31:0][31:0] r_data_out1;
-	wire [31:0][31:0] r_data_in;
+	wire [31:0] r_data_out0[0:31];
+	wire [31:0] r_data_out1[0:31];
+	wire [31:0] r_data_in[0:31];
 	logic [31:0] rd0_data_r;
 	logic [31:0] rd1_data_r;
+
+	logic [31:0] discarded_writes;
 
 	assign rd0_data = rd0_en? rd0_data_r : '0;
 	assign rd1_data = rd1_en? rd1_data_r : '0;
@@ -103,7 +105,7 @@ module register32bit_file (
 
 	demux1to32 wr_demux(.sel(wr_addr),
 											.in(wr_data),
-											//.out0('Z),  //leave unconnected
+											.out0(discarded_writes),
 											.out1(r_data_in[1]),
 											.out2(r_data_in[2]),
 											.out3(r_data_in[3]),

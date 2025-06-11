@@ -66,7 +66,7 @@ module exec_unit (
 	);
 
 	always_ff @(posedge clk) begin
-		raw_hazard_1 <= ((if_id_reg.fetched_inst[11:7] != 0) && (id_ex_reg.reg_wr_addr == if_id_reg.fetched_inst[19:15]));
+		raw_hazard_1 <= ((if_id_reg.fetched_inst[11:7] != 0) && (id_ex_reg.reg_wr_addr != 0) && (id_ex_reg.reg_wr_addr == if_id_reg.fetched_inst[19:15]));
 		raw_hazard_0 <= 0;
 	end
 
