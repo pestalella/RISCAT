@@ -27,6 +27,14 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 				`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 2; req.src == 0; req.imm == 12'b111111111111;})
 				`uvm_do_with(req, { req.cmd == CMD_SLTI; req.dst == 29; req.src == 2; req.imm == 0;})  // r29 = 1
 		end
+
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
+
 	endtask: body
 
 endclass: exec_core_sequence

@@ -4,6 +4,7 @@
 typedef enum {ADDI, SLTI, SLTIU, XORI, ORI, ANDI} instruction;
 
 class reg_imm_instruction;
+	instruction op;
 	rand bit[11:0] imm;
 	rand bit[4:0] src;
 	bit[2:0] inst_sel;
@@ -11,6 +12,7 @@ class reg_imm_instruction;
 	bit [6:0] opcode;
 
 	function new(instruction inst);
+		op = inst;
 		opcode = 7'b0010011;
 		if (inst == ADDI) begin
 			inst_sel = 3'b000;
@@ -28,7 +30,7 @@ class reg_imm_instruction;
 	endfunction
 
 	function string sprint();
-		return $sformatf("r%1d = r%1d + %1d", dst, src,  signed'({{20{imm[11]}}, imm[11:0]}));
+		return $sformatf("%s r%1d, r%1d, %1d", op.name, dst, src,  signed'({{20{imm[11]}}, imm[11:0]}));
 
 		// return $sformatf(
 		// 	"------------------------------\n- Instruction -\n------------------------------\n  opcode:\t%07b\n  sel:\t%03b\n  src:\t%d\n  dest:\t%d\n  imm:\t%d\n------------------------------",

@@ -44,7 +44,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				inst.dst = req.dst;
 
 				@(posedge vif.clk);
-				`uvm_info(get_type_name(), $sformatf("Inj ADDI at PC=%04h: %s",
+				`uvm_info(get_type_name(), $sformatf("[%04h]: %s",
 					vif.rd_ram_addr, inst.sprint()), UVM_MEDIUM)
 
 				vif.rd_ram_data <= inst.encoded();
@@ -55,6 +55,28 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				action_received.src = req.src;
 				action_received.dest = req.dst;
 				action_received.m_action = INST_ADDI;
+				m_ap.write(action_received);
+			end else if (req.cmd == CMD_SLTI)
+			begin
+				exec_core_message action_received;
+				reg_imm_instruction inst = new(SLTI);
+
+				inst.imm = req.imm;
+				inst.src = req.src;
+				inst.dst = req.dst;
+
+				@(posedge vif.clk);
+				`uvm_info(get_type_name(), $sformatf("[%04h]: %s",
+					vif.rd_ram_addr, inst.sprint()), UVM_MEDIUM)
+
+				vif.rd_ram_data <= inst.encoded();
+
+				action_received = exec_core_message::type_id::create("action_received", this);
+				action_received.pc = vif.rd_ram_addr;
+				action_received.imm = req.imm;
+				action_received.src = req.src;
+				action_received.dest = req.dst;
+				action_received.m_action = INST_SLTI;
 				m_ap.write(action_received);
 
 			end	else begin

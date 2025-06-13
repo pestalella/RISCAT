@@ -2,7 +2,16 @@
 `define __EXEC_CORE_ACTION_SV__
 
 
-typedef enum {RESET, INST_ADDI, REG_WR} exec_core_action;
+typedef enum {
+	RESET,
+	INST_ADDI,
+	INST_SLTI,
+	INST_SLTIU,
+	INST_XORI,
+	INST_ORI,
+	INST_ANDI,
+	REG_WR
+} exec_core_action;
 
 `include "uvm_macros.svh"
 

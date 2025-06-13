@@ -36,7 +36,7 @@ class exec_core_monitor extends uvm_monitor;
 			end else if (regfile_vif.wr_en) begin
 				`uvm_info(get_type_name(),
 					$sformatf("Detected a register file write. r%1d = %1d",
-						regfile_vif.wr_addr, regfile_vif.wr_data),
+						regfile_vif.wr_addr, signed'(regfile_vif.wr_data)),
 					UVM_MEDIUM);
 				tx = exec_core_message::type_id::create("tx", this);
 				tx.m_action  = REG_WR;

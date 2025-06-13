@@ -30,7 +30,7 @@ module alu_stage(
 				ex_wb_reg.reg_wr_addr <= id_ex_reg.reg_wr_addr;
 				ex_wb_reg.reg_wr_en <= id_ex_reg.reg_wr_en;
 			end else if (id_ex_reg.alu_op == ALU_SLTI) begin
-				ex_wb_reg.alu_result <= id_ex_reg.inst_imm_sgn > alu_reg_input_b;
+				ex_wb_reg.alu_result <= (signed'(id_ex_reg.inst_imm_sgn) > signed'(alu_reg_input_b))? 1 : 0;
 				ex_wb_reg.alu_result_ready <= 1;
 				ex_wb_reg.reg_wr_addr <= id_ex_reg.reg_wr_addr;
 				ex_wb_reg.reg_wr_en <= id_ex_reg.reg_wr_en;
