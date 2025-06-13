@@ -54,13 +54,14 @@ module decode_unit(
 			id_ex_reg.reg_rd1_en <= is_reg_imm_inst;
 			id_ex_reg.reg_wr_en <= is_reg_imm_inst;
 			id_ex_reg.input_a_is_immediate <= is_reg_imm_inst;
-			id_ex_reg.inst_imm <= is_reg_imm_inst? if_id_reg.fetched_inst[31:20] : 0;
-			id_ex_reg.alu_op <= is_addi? ALU_ADD : (
-													is_slti? ALU_SLT : (
-													is_sltiu? ALU_SLTU : (
-													is_xori? ALU_XOR : (
-													is_ori? ALU_OR : (
-													is_andi? ALU_AND :
+			id_ex_reg.inst_imm <= is_reg_imm_inst? {{20{if_id_reg.fetched_inst[31]}}, if_id_reg.fetched_inst[31:20]} : 32'b0;
+			id_ex_reg.inst_imm_sgn <= is_reg_imm_inst? {{20{if_id_reg.fetched_inst[31]}}, if_id_reg.fetched_inst[31:20]} : 0;
+			id_ex_reg.alu_op <= is_addi? ALU_ADDI : (
+													is_slti? ALU_SLTI : (
+													is_sltiu? ALU_SLTIU : (
+													is_xori? ALU_XORI : (
+													is_ori? ALU_ORI : (
+													is_andi? ALU_ANDI :
 													ALU_NONE
 													)))));
 		end

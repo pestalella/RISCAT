@@ -3,15 +3,12 @@
 
 typedef enum bit[3:0] {
 	ALU_NONE,
-	ALU_ADD,
-	ALU_SUB,
-	ALU_SLT,
-	ALU_SLTU,
-	ALU_XOR,
-	ALU_OR,
-	ALU_AND,
-	ALU_SHL,
-	ALU_SHR
+	ALU_ADDI,
+	ALU_SLTI,
+	ALU_SLTIU,
+	ALU_XORI,
+	ALU_ORI,
+	ALU_ANDI
 } alu_command_t;
 
 `endif

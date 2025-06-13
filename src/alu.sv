@@ -24,8 +24,13 @@ module alu_stage(
 			if (id_ex_reg.alu_op == ALU_NONE) begin
 				ex_wb_reg.alu_result <= '0;
 				ex_wb_reg.alu_result_ready <= 0;
-			end else if (id_ex_reg.alu_op == ALU_ADD) begin
-				ex_wb_reg.alu_result <=  id_ex_reg.input_a_is_immediate? id_ex_reg.inst_imm + alu_reg_input_b : 0;
+			end else if (id_ex_reg.alu_op == ALU_ADDI) begin
+				ex_wb_reg.alu_result <= id_ex_reg.inst_imm + alu_reg_input_b;
+				ex_wb_reg.alu_result_ready <= 1;
+				ex_wb_reg.reg_wr_addr <= id_ex_reg.reg_wr_addr;
+				ex_wb_reg.reg_wr_en <= id_ex_reg.reg_wr_en;
+			end else if (id_ex_reg.alu_op == ALU_SLTI) begin
+				ex_wb_reg.alu_result <= id_ex_reg.inst_imm_sgn > alu_reg_input_b;
 				ex_wb_reg.alu_result_ready <= 1;
 				ex_wb_reg.reg_wr_addr <= id_ex_reg.reg_wr_addr;
 				ex_wb_reg.reg_wr_en <= id_ex_reg.reg_wr_en;

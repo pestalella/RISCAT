@@ -5,8 +5,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 
 	exec_core_message transactions[$];
 
-	bit [31:0] regfile_copy [0:31];
-	bit [31:0] expected_reg_inputs [0:31];
+	bit[31:0] regfile_copy [0:31];
+	bit[31:0] expected_reg_inputs [0:31];
 
 	`uvm_component_utils_begin(exec_core_scoreboard)
 		// `uvm_field_int(transaction_count, UVM_DEFAULT|UVM_DEC)
@@ -33,15 +33,15 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			transactions.delete();
 		end else if (tx.m_action == INST_ADDI) begin
 //			`uvm_info(get_type_name(), $sformatf("received a ADDI action:\n%s", tx.to_asm_string()), UVM_MEDIUM)
-			tx.reg_wr_data = expected_reg_inputs[tx.src] + tx.imm;
+			tx.reg_wr_data = signed'(expected_reg_inputs[tx.src]) + signed'({{20{tx.imm[11]}}, tx.imm[11:0]});
 			if (tx.dest != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d)+%1d",
-				 	tx.dest, expected_reg_inputs[tx.dest], tx.src, expected_reg_inputs[tx.src], tx.imm), UVM_MEDIUM)
+				 	tx.dest, signed'(expected_reg_inputs[tx.dest]), tx.src, signed'(expected_reg_inputs[tx.src]), signed'({{20{tx.imm[11]}}, tx.imm[11:0]})), UVM_MEDIUM)
 
-				expected_reg_inputs[tx.dest] = expected_reg_inputs[tx.src] + tx.imm;
+				expected_reg_inputs[tx.dest] = signed'(expected_reg_inputs[tx.src]) + signed'({{20{tx.imm[11]}}, tx.imm[11:0]});
 
 				`uvm_info(get_type_name(), $sformatf("r%1d =%1d",
-				 	tx.dest, expected_reg_inputs[tx.dest]), UVM_MEDIUM)
+				 	tx.dest, signed'(expected_reg_inputs[tx.dest])), UVM_MEDIUM)
 			end
 			`uvm_info(get_type_name, $sformatf("Saving transaction:\n%s", tx.sprint()), UVM_DEBUG)
 
@@ -61,12 +61,12 @@ class exec_core_scoreboard extends uvm_scoreboard;
 					`uvm_fatal(get_type_name(),
 						$sformatf("received a write to r%1d, was expecting a write to r%1d", tx.dest, saved_transaction.dest))
 
-				assert (tx.reg_wr_data == saved_transaction.reg_wr_data)
+				assert (signed'(tx.reg_wr_data) == signed'(saved_transaction.reg_wr_data))
 					regfile_copy[tx.dest] = saved_transaction.reg_wr_data;
 				else
 					`uvm_error(get_type_name(),
 						$sformatf("received a write to r%1d, expected value was %1d, received %1d instead.\nReceived transaction:\n%sSaved transaction:\n%s",
-							tx.dest, saved_transaction.reg_wr_data, tx.reg_wr_data, tx.sprint(), saved_transaction.sprint()))
+							tx.dest, signed'(saved_transaction.reg_wr_data), signed'(tx.reg_wr_data), tx.sprint(), saved_transaction.sprint()))
 			end
 		end
   endfunction

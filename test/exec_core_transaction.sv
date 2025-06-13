@@ -1,4 +1,12 @@
-typedef enum {CMD_RESET, CMD_ADDI} exec_core_cmd;
+typedef enum {
+	CMD_RESET,
+	CMD_ADDI,
+	CMD_SLTI,
+	CMD_SLTIU,
+	CMD_XORI,
+	CMD_ORI,
+	CMD_ANDI
+} exec_core_cmd;
 
 `include "uvm_macros.svh"
 
