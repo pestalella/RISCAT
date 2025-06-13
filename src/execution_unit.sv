@@ -35,12 +35,6 @@ module exec_unit (
 			end
 	end
 
-	// Clear internal data on reset
-  // always @(posedge clk) begin
-  //   if (!reset_n) begin
-	// 	end
-	// end
-
 	IF_ID if_id_reg;
 	ID_EX id_ex_reg;
 	EX_WB ex_wb_reg;
