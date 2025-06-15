@@ -28,13 +28,61 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 				`uvm_do_with(req, { req.cmd == CMD_SLTI; req.dst == 29; req.src == 2; req.imm == 0;})  // r29 = 1
 		end
 
-		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
-		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
-		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
-		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
-		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
-		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
+		repeat(1)
+		begin
+				`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 1; req.src == 0; req.imm == 10;})
+				`uvm_do_with(req, { req.cmd == CMD_SLTIU; req.dst == 31; req.src == 1; req.imm == 11;})  // r31 = 1
+				`uvm_do_with(req, { req.cmd == CMD_SLTIU; req.dst == 30; req.src == 1; req.imm == 9;})  // r30 = 0
+				`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 2; req.src == 0; req.imm == 12'b111111111111;})
+				`uvm_do_with(req, { req.cmd == CMD_SLTIU; req.dst == 29; req.src == 2; req.imm == 0;})  // r29 = 0
+		end
 
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 1; req.src == 0; req.imm == 'b101010101010;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 2; req.src == 0; req.imm == 'b111111000000;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 3; req.src == 0; req.imm == 'b000000111111;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 4; req.src == 0; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_ANDI; req.dst == 10; req.src == 1; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_ANDI; req.dst == 11; req.src == 2; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_ANDI; req.dst == 12; req.src == 3; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_ANDI; req.dst == 13; req.src == 4; req.imm == 'b111111111111;})
+
+		`uvm_do_with(req, { req.cmd == CMD_ANDI; req.dst == 20; req.src == 1; req.imm == 'b010101010101;})
+		`uvm_do_with(req, { req.cmd == CMD_ANDI; req.dst == 21; req.src == 2; req.imm == 'b000000000000;})
+		`uvm_do_with(req, { req.cmd == CMD_ANDI; req.dst == 22; req.src == 3; req.imm == 'b101010101010;})
+		`uvm_do_with(req, { req.cmd == CMD_ANDI; req.dst == 23; req.src == 4; req.imm == 'b001100110011;})
+
+
+		`uvm_do_with(req, { req.cmd == CMD_XORI; req.dst == 10; req.src == 1; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_XORI; req.dst == 11; req.src == 2; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_XORI; req.dst == 12; req.src == 3; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_XORI; req.dst == 13; req.src == 4; req.imm == 'b111111111111;})
+
+		`uvm_do_with(req, { req.cmd == CMD_XORI; req.dst == 20; req.src == 1; req.imm == 'b010101010101;})
+		`uvm_do_with(req, { req.cmd == CMD_XORI; req.dst == 21; req.src == 2; req.imm == 'b000000000000;})
+		`uvm_do_with(req, { req.cmd == CMD_XORI; req.dst == 22; req.src == 3; req.imm == 'b101010101010;})
+		`uvm_do_with(req, { req.cmd == CMD_XORI; req.dst == 23; req.src == 4; req.imm == 'b001100110011;})
+
+		`uvm_do_with(req, { req.cmd == CMD_ORI; req.dst == 10; req.src == 1; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_ORI; req.dst == 11; req.src == 2; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_ORI; req.dst == 12; req.src == 3; req.imm == 'b111111111111;})
+		`uvm_do_with(req, { req.cmd == CMD_ORI; req.dst == 13; req.src == 4; req.imm == 'b111111111111;})
+
+		`uvm_do_with(req, { req.cmd == CMD_ORI; req.dst == 20; req.src == 1; req.imm == 'b010101010101;})
+		`uvm_do_with(req, { req.cmd == CMD_ORI; req.dst == 21; req.src == 2; req.imm == 'b000000000000;})
+		`uvm_do_with(req, { req.cmd == CMD_ORI; req.dst == 22; req.src == 3; req.imm == 'b101010101010;})
+		`uvm_do_with(req, { req.cmd == CMD_ORI; req.dst == 23; req.src == 4; req.imm == 'b001100110011;})
+
+
+		// repeat(1000)
+		// begin
+		// 		`uvm_do_with(req, { req.cmd != CMD_RESET;})
+		// end
+
+		// Epilogue to drain all the `previous intructions
+		repeat(10)
+		begin
+			`uvm_do_with(req, { req.cmd == CMD_ADDI; req.dst == 0; req.src == 0; req.imm == 0;})
+		end
 	endtask: body
 
 endclass: exec_core_sequence

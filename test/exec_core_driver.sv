@@ -34,53 +34,53 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				vif.reset_n  <= 1;
 				vif.rd_ram_data <= '{default:0};
 				@(posedge vif.clk);  // wait a clock cycle to stabilize signals
-			end else if (req.cmd == CMD_ADDI)
-			begin
-				exec_core_message action_received;
-				reg_imm_instruction inst = new(ADDI);
+			end else begin
+				exec_core_message action_received  = exec_core_message::type_id::create("action_received", this);
+				reg_imm_instruction inst;
+
+				if (req.cmd == CMD_ADDI)
+				begin
+					inst = new(ADDI);
+					action_received.m_action = INST_ADDI;
+				end else if (req.cmd == CMD_SLTI)
+				begin
+					inst = new(SLTI);
+					action_received.m_action = INST_SLTI;
+				end else if (req.cmd == CMD_SLTIU)
+				begin
+					inst = new(SLTIU);
+					action_received.m_action = INST_SLTIU;
+				end else if (req.cmd == CMD_ANDI)
+				begin
+					inst = new(ANDI);
+					action_received.m_action = INST_ANDI;
+				end else if (req.cmd == CMD_XORI)
+				begin
+					inst = new(XORI);
+					action_received.m_action = INST_XORI;
+				end else if (req.cmd == CMD_ORI)
+				begin
+					inst = new(ORI);
+					action_received.m_action = INST_ORI;
+
+				end	else begin
+					`uvm_warning(get_type_name(), $sformatf("Unimplemented command in transaction:\n%s", req.sprint()))
+				end
 
 				inst.imm = req.imm;
 				inst.src = req.src;
 				inst.dst = req.dst;
-
-				@(posedge vif.clk);
-				`uvm_info(get_type_name(), $sformatf("[%04h]: %s",
-					vif.rd_ram_addr, inst.sprint()), UVM_MEDIUM)
-
 				vif.rd_ram_data <= inst.encoded();
 
-				action_received = exec_core_message::type_id::create("action_received", this);
+				@(posedge vif.clk);
+
+				`uvm_info(get_type_name(), $sformatf("[%04h]: %s", vif.rd_ram_addr, inst.sprint()), UVM_MEDIUM)
+
 				action_received.pc = vif.rd_ram_addr;
 				action_received.imm = req.imm;
 				action_received.src = req.src;
 				action_received.dest = req.dst;
-				action_received.m_action = INST_ADDI;
 				m_ap.write(action_received);
-			end else if (req.cmd == CMD_SLTI)
-			begin
-				exec_core_message action_received;
-				reg_imm_instruction inst = new(SLTI);
-
-				inst.imm = req.imm;
-				inst.src = req.src;
-				inst.dst = req.dst;
-
-				@(posedge vif.clk);
-				`uvm_info(get_type_name(), $sformatf("[%04h]: %s",
-					vif.rd_ram_addr, inst.sprint()), UVM_MEDIUM)
-
-				vif.rd_ram_data <= inst.encoded();
-
-				action_received = exec_core_message::type_id::create("action_received", this);
-				action_received.pc = vif.rd_ram_addr;
-				action_received.imm = req.imm;
-				action_received.src = req.src;
-				action_received.dest = req.dst;
-				action_received.m_action = INST_SLTI;
-				m_ap.write(action_received);
-
-			end	else begin
-				`uvm_fatal(get_type_name(), "Unimplemented command in transaction")
 			end
 			seq_item_port.item_done();
 

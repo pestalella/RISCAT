@@ -32,39 +32,9 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			expected_reg_inputs = '{default:0};
 			transactions.delete();
 		end
-		else if (tx.m_action == INST_ADDI) begin
-			tx.reg_wr_data = signed'(expected_reg_inputs[tx.src]) + signed'({{20{tx.imm[11]}}, tx.imm[11:0]});
-			if (tx.dest != 0) begin
-				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d)+%1d",
-				 	tx.dest, signed'(expected_reg_inputs[tx.dest]), tx.src, signed'(expected_reg_inputs[tx.src]), signed'({{20{tx.imm[11]}}, tx.imm[11:0]})), UVM_MEDIUM)
-
-				expected_reg_inputs[tx.dest] = signed'(expected_reg_inputs[tx.src]) + signed'({{20{tx.imm[11]}}, tx.imm[11:0]});
-
-				`uvm_info(get_type_name(), $sformatf("r%1d =%1d",
-				 	tx.dest, signed'(expected_reg_inputs[tx.dest])), UVM_MEDIUM)
-			end
-			`uvm_info(get_type_name, $sformatf("Saving transaction:\n%s", tx.sprint()), UVM_DEBUG)
-			transactions.push_back(tx);  // saved for later check
-		end
-		else if (tx.m_action == INST_SLTI) begin
-			tx.reg_wr_data = signed'(expected_reg_inputs[tx.src]) < signed'({{20{tx.imm[11]}}, tx.imm[11:0]}) ? 1 : 0;
-			if (tx.dest != 0) begin
-				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) < %1d",
-				 	tx.dest, signed'(expected_reg_inputs[tx.dest]), tx.src, signed'(expected_reg_inputs[tx.src]), signed'({{20{tx.imm[11]}}, tx.imm[11:0]})), UVM_MEDIUM)
-
-				expected_reg_inputs[tx.dest] = tx.reg_wr_data;
-
-				`uvm_info(get_type_name(), $sformatf("r%1d =%1d",
-				 	tx.dest, signed'(expected_reg_inputs[tx.dest])), UVM_MEDIUM)
-			end
-			`uvm_info(get_type_name, $sformatf("Saving transaction:\n%s", tx.sprint()), UVM_DEBUG)
-			transactions.push_back(tx);  // saved for later check
-		end
 		else if (tx.m_action == REG_WR) begin
 			exec_core_message saved_transaction = transactions.pop_front();
 			`uvm_info(get_type_name, $sformatf("Popped transaction:\n%s", saved_transaction.sprint()), UVM_DEBUG)
-			//`uvm_info(get_type_name(), $sformatf("stored transactions: %1d", transactions.size()), UVM_MEDIUM)
-			// `uvm_info(get_type_name(), $sformatf("received a RegisterWrite action:\n%s\nsaved_transaciont:\n%s\n", tx.sprint(), saved_transaction.sprint()), UVM_MEDIUM)
 			if (tx.dest == 0) begin
 				`uvm_info(get_type_name, "Ignoring write to r0", UVM_MEDIUM)
 			end else begin
@@ -76,10 +46,60 @@ class exec_core_scoreboard extends uvm_scoreboard;
 					regfile_copy[tx.dest] = saved_transaction.reg_wr_data;
 				else
 					`uvm_error(get_type_name(),
-						$sformatf("received a write to r%1d, expected value was %1d, received %1d instead.\nReceived transaction:\n%sSaved transaction:\n%s",
-							tx.dest, signed'(saved_transaction.reg_wr_data), signed'(tx.reg_wr_data), tx.sprint(), saved_transaction.sprint()))
+						$sformatf("received a write to r%1d, expected value was %1b, received %1b instead.\nReceived transaction:\n%sSaved transaction:\n%s",
+							tx.dest, saved_transaction.reg_wr_data, tx.reg_wr_data, tx.sprint(), saved_transaction.sprint()))
 			end
+		end	else begin
+				if (tx.m_action == INST_ADDI) begin
+				tx.reg_wr_data = signed'(expected_reg_inputs[tx.src]) + signed'({{20{tx.imm[11]}}, tx.imm[11:0]});
+				if (tx.dest != 0) begin
+					`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d)+%1d",
+						tx.dest, signed'(expected_reg_inputs[tx.dest]), tx.src, signed'(expected_reg_inputs[tx.src]), signed'({{20{tx.imm[11]}}, tx.imm[11:0]})), UVM_MEDIUM)
+				end
+			end
+			else if (tx.m_action == INST_SLTI) begin
+				tx.reg_wr_data = signed'(expected_reg_inputs[tx.src]) < signed'({{20{tx.imm[11]}}, tx.imm[11:0]}) ? 1 : 0;
+				if (tx.dest != 0) begin
+					`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) < %1d",
+						tx.dest, signed'(expected_reg_inputs[tx.dest]), tx.src, signed'(expected_reg_inputs[tx.src]), signed'({{20{tx.imm[11]}}, tx.imm[11:0]})), UVM_MEDIUM)
+				end
+			end
+			else if (tx.m_action == INST_SLTIU) begin
+				tx.reg_wr_data = expected_reg_inputs[tx.src] < {{20{tx.imm[11]}}, tx.imm[11:0]} ? 1 : 0;
+				if (tx.dest != 0) begin
+					`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) < %1d",
+						tx.dest, signed'(expected_reg_inputs[tx.dest]), tx.src, expected_reg_inputs[tx.src], {{20{tx.imm[11]}}, tx.imm[11:0]}), UVM_MEDIUM)
+				end
+			end
+			else if (tx.m_action == INST_ANDI) begin
+				tx.reg_wr_data = expected_reg_inputs[tx.src] & {{20{tx.imm[11]}}, tx.imm[11:0]};
+				if (tx.dest != 0) begin
+					`uvm_info(get_type_name(), $sformatf("r%1d(=%1b) = r%1d(=%1b) & %1b",
+						tx.dest, signed'(expected_reg_inputs[tx.dest]), tx.src, expected_reg_inputs[tx.src], {{20{tx.imm[11]}}, tx.imm[11:0]}), UVM_MEDIUM)
+				end
+			end
+			else if (tx.m_action == INST_XORI) begin
+				tx.reg_wr_data = expected_reg_inputs[tx.src] ^ {{20{tx.imm[11]}}, tx.imm[11:0]};
+				if (tx.dest != 0) begin
+					`uvm_info(get_type_name(), $sformatf("r%1d(=%1b) = r%1d(=%1b) ^ %1b",
+						tx.dest, signed'(expected_reg_inputs[tx.dest]), tx.src, expected_reg_inputs[tx.src], {{20{tx.imm[11]}}, tx.imm[11:0]}), UVM_MEDIUM)
+				end
+			end
+			else if (tx.m_action == INST_ORI) begin
+				tx.reg_wr_data = expected_reg_inputs[tx.src] | {{20{tx.imm[11]}}, tx.imm[11:0]};
+				if (tx.dest != 0) begin
+					`uvm_info(get_type_name(), $sformatf("r%1d(=%1b) = r%1d(=%1b) | %1b",
+						tx.dest, signed'(expected_reg_inputs[tx.dest]), tx.src, expected_reg_inputs[tx.src], {{20{tx.imm[11]}}, tx.imm[11:0]}), UVM_MEDIUM)
+				end
+			end
+			if (tx.dest != 0) begin
+					expected_reg_inputs[tx.dest] = tx.reg_wr_data;
+					`uvm_info(get_type_name(), $sformatf("r%1d =%1b",	tx.dest, expected_reg_inputs[tx.dest]), UVM_MEDIUM)
+			end
+			`uvm_info(get_type_name, $sformatf("Saving transaction:\n%s", tx.sprint()), UVM_DEBUG)
+			transactions.push_back(tx);  // saved for later check
 		end
+
   endfunction
 
 endclass
