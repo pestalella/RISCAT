@@ -5,7 +5,17 @@ typedef enum {
 	CMD_SLTIU,
 	CMD_XORI,
 	CMD_ORI,
-	CMD_ANDI
+	CMD_ANDI,
+	CMD_ADD,
+	CMD_SUB,
+	CMD_SLL,
+	CMD_SLT,
+	CMD_SLTU,
+	CMD_XOR,
+	CMD_SRL,
+	CMD_SRA,
+	CMD_OR,
+	CMD_AND
 } exec_core_cmd;
 
 `include "uvm_macros.svh"
@@ -15,7 +25,8 @@ import uvm_pkg::*;
 class exec_core_transaction extends uvm_sequence_item;
 
 	rand exec_core_cmd cmd;
-	rand bit[4:0] src;
+	rand bit[4:0] rs1;
+	rand bit[4:0] rs2;
 	rand bit[4:0] dst;
 	rand bit[11:0] imm;
 

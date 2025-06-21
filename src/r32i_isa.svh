@@ -1,7 +1,24 @@
 `ifndef R32I_ISA_SVH
 `define R32I_ISA_SVH
 
-typedef enum {ADDI, SLTI, SLTIU, XORI, ORI, ANDI} instruction;
+typedef enum {
+	ADDI,
+	SLTI,
+	SLTIU,
+	XORI,
+	ORI,
+	ANDI,
+	ADD,
+	SUB,
+	SLL,
+	SLT,
+	SLTU,
+	XOR,
+	SRL,
+	SRA,
+	OR,
+	AND
+} instruction;
 
 class reg_imm_instruction;
 	instruction op;

@@ -1,14 +1,24 @@
 `ifndef ALU_ENUMS_SVH
 `define ALU_ENUMS_SVH
 
-typedef enum bit[3:0] {
+typedef enum {
 	ALU_NONE,
 	ALU_ADDI,
 	ALU_SLTI,
 	ALU_SLTIU,
 	ALU_XORI,
 	ALU_ORI,
-	ALU_ANDI
+	ALU_ANDI,
+	ALU_ADD,
+	ALU_SUB,
+	ALU_SLL,
+	ALU_SLT,
+	ALU_SLTU,
+	ALU_XOR,
+	ALU_SRL,
+	ALU_SRA,
+	ALU_OR,
+	ALU_AND
 } alu_command_t;
 
 `endif
