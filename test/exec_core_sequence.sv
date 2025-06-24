@@ -80,10 +80,10 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 	// CMD_AND
 
 
-		repeat(1000)
-		begin
-				`uvm_do_with(req, { req.cmd != CMD_RESET;})
-		end
+		// repeat(1000)
+		// begin
+		// 		`uvm_do_with(req, { req.cmd != CMD_RESET;})
+		// end
 
 		// Epilogue to drain all the `previous intructions
 		repeat(10)

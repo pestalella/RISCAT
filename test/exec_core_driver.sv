@@ -54,6 +54,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ORI)
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ANDI)
 					begin
+						`uvm_error(get_type_name(), $sformatf("UNSUPPORTED REQUEST:%s", req.cmd.name))
 					end
 					inst_reg_imm.imm = req.imm;
 					inst_reg_imm.rs1 = req.rs1;
