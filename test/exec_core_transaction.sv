@@ -25,9 +25,11 @@ import uvm_pkg::*;
 class exec_core_transaction extends uvm_sequence_item;
 
 	rand exec_core_cmd cmd;
+	bit is_reg_imm;
+	bit is_reg_reg;
 	rand bit[4:0] rs1;
 	rand bit[4:0] rs2;
-	rand bit[4:0] dst;
+	rand bit[4:0] rd;
 	rand bit[11:0] imm;
 
 	function new (string name = "");

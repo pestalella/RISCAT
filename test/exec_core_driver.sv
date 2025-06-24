@@ -2,11 +2,11 @@
 `include "exec_core_action.sv"
 `include "exec_unit_probe_if.sv"
 
-`define IF_CREATE_INSTRUCTION_ELSE(result, inst_name)   \
-	if (req.cmd == CMD_``inst_name) 							 \
-	begin										 								 \
-		`result = new(``inst_name);			 							 \
-		action_received.m_action = INST_``inst_name; \
+`define IF_CREATE_INSTRUCTION_ELSE(result, inst_name) \
+	if (req.cmd == CMD_``inst_name) 				  \
+	begin										 	  \
+		``result = new(``inst_name);			 		  \
+		action_received.m_action = INST_``inst_name;  \
 	end else
 
 class exec_core_driver extends uvm_driver #(exec_core_transaction);
@@ -43,113 +43,48 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				@(posedge vif.clk);  // wait a clock cycle to stabilize signals
 			end else begin
 				exec_core_message action_received  = exec_core_message::type_id::create("action_received", this);
-				reg_imm_instruction inst_reg_imm;
-				reg_imm_instruction inst;
 
-				`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ADDI)
-				`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, SLTI)
-				`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, SLTIU)
-				`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, XORI)
-				`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ORI)
-				`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ANDI)
-				`IF_CREATE_INSTRUCTION_ELSE(ADD)
-				`IF_CREATE_INSTRUCTION_ELSE(SUB)
-				`IF_CREATE_INSTRUCTION_ELSE(SLL)
-				`IF_CREATE_INSTRUCTION_ELSE(SLT)
-				`IF_CREATE_INSTRUCTION_ELSE(SLTU)
-				`IF_CREATE_INSTRUCTION_ELSE(XOR)
-				`IF_CREATE_INSTRUCTION_ELSE(SRL)
-				`IF_CREATE_INSTRUCTION_ELSE(SRA)
-				`IF_CREATE_INSTRUCTION_ELSE(OR)
-				`IF_CREATE_INSTRUCTION_ELSE(AND)
-				begin
-					`uvm_warning(get_type_name(), $sformatf("Unimplemented command in transaction:\n%s", req.sprint()))
-				end
+				if (req.is_reg_imm) begin
+					reg_imm_inst inst_reg_imm;
 
-				// if (req.cmd == CMD_ADDI)
-				// begin
-				// 	inst = new(ADDI);
-				// 	action_received.m_action = INST_ADDI;
-				// end else if (req.cmd == CMD_SLTI)
-				// begin
-				// 	inst = new(SLTI);
-				// 	action_received.m_action = INST_SLTI;
-				// end else if (req.cmd == CMD_SLTIU)
-				// begin
-				// 	inst = new(SLTIU);
-				// 	action_received.m_action = INST_SLTIU;
-				// end else if (req.cmd == CMD_ANDI)
-				// begin
-				// 	inst = new(ANDI);
-				// 	action_received.m_action = INST_ANDI;
-				// end else if (req.cmd == CMD_XORI)
-				// begin
-				// 	inst = new(XORI);
-				// 	action_received.m_action = INST_XORI;
-				// end else if (req.cmd == CMD_ADD)
-				// begin
-				// 	inst = new(ADD);
-				// 	action_received.m_action = INST_ADD;
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ADDI)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, SLTI)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, SLTIU)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, XORI)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ORI)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ANDI)
+					begin
+					end
+					inst_reg_imm.imm = req.imm;
+					inst_reg_imm.rs1 = req.rs1;
+					inst_reg_imm.rd = req.rd;
+					vif.rd_ram_data <= inst_reg_imm.encoded();
+					@(posedge vif.clk);
 
-				// end else if (req.cmd == CMD_SUB)
-				// begin
-				// 	inst = new(SUB);
-				// 	action_received.m_action = INST_SUB;
-				// end else if (req.cmd == CMD_SLL)
-				// begin
-				// 	inst = new(SLL);
-				// 	action_received.m_action = INST_SLL;
-				// end else if (req.cmd == CMD_SLT)
-				// begin
-				// 	inst = new(SLT);
-				// 	action_received.m_action = INST_SLT;
-				// end else if (req.cmd == CMD_SLTU)
-				// begin
-				// 	inst = new(SLTU);
-				// 	action_received.m_action = INST_SLTU;
-				// end else if (req.cmd == CMD_XOR)
-				// begin
-				// 	inst = new(XOR);
-				// 	action_received.m_action = INST_XOR;
-				// end else if (req.cmd == CMD_SRL)
-				// begin
-				// 	inst = new(SRL);
-				// 	action_received.m_action = INST_SRL;
-				// end else if (req.cmd == CMD_ORI)
-				// begin
-				// 	inst = new(ORI);
-				// 	action_received.m_action = INST_ORI;
-				// end else if (req.cmd == CMD_ORI)
-				// begin
-				// 	inst = new(ORI);
-				// 	action_received.m_action = INST_ORI;
-				// end else if (req.cmd == CMD_ORI)
-				// begin
-				// 	inst = new(ORI);
-				// 	action_received.m_action = INST_ORI;
-				// end else if (req.cmd == CMD_ORI)
-				// begin
-				// 	inst = new(ORI);
-				// 	action_received.m_action = INST_ORI;
-				// end else
+					`uvm_info(get_type_name(), $sformatf("[%04h]: %s", vif.rd_ram_addr, inst_reg_imm.sprint()), UVM_MEDIUM)
+
+					action_received.pc = vif.rd_ram_addr;
+					action_received.imm = req.imm;
+					action_received.rs1 = req.rs1;
+					action_received.rd = req.rd;
+					m_ap.write(action_received);
+				end else if (req.is_reg_reg) begin
+					reg_reg_inst inst_reg_reg;
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, ADD)
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SUB)
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SLL)
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SLT)
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SLTU)
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, XOR)
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SRL)
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SRA)
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, OR)
+				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, AND)
 				// begin
 				// 	`uvm_warning(get_type_name(), $sformatf("Unimplemented command in transaction:\n%s", req.sprint()))
 				// end
+				end
 
-				inst.imm = req.imm;
-				inst.src = req.rs1;
-				inst.dst = req.dst;
-				vif.rd_ram_data <= inst.encoded();
-
-				@(posedge vif.clk);
-
-				`uvm_info(get_type_name(), $sformatf("[%04h]: %s", vif.rd_ram_addr, inst.sprint()), UVM_MEDIUM)
-
-				action_received.pc = vif.rd_ram_addr;
-				action_received.imm = req.imm;
-				action_received.rs1 = req.rs1;
-				action_received.dest = req.dst;
-				m_ap.write(action_received);
 			end
 			seq_item_port.item_done();
 
@@ -157,7 +92,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 	endtask
 
 	function bit[31:0] generate_instruction(instruction rv_inst);
-		reg_imm_instruction inst = new(ADDI);
+		reg_imm_inst inst = new(ADDI);
 		`uvm_info(get_type_name(), $sformatf("Generated instruction: 0x%h", inst.encoded()), UVM_MEDIUM)
 		return inst.encoded();
 	endfunction

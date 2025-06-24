@@ -34,7 +34,7 @@ class exec_core_message extends uvm_sequence_item;
 	bit[11:0] imm;
 	bit[4:0] rs1;
 	bit[4:0] rs2;
-	bit[4:0] dest;
+	bit[4:0] rd;
 	bit[31:0] reg_wr_data;
 
 	function new (string name = "");
@@ -47,7 +47,7 @@ class exec_core_message extends uvm_sequence_item;
 		`uvm_field_int(imm, UVM_DEFAULT|UVM_HEX)
 		`uvm_field_int(rs1, UVM_DEFAULT)
 		`uvm_field_int(rs2, UVM_DEFAULT)
-		`uvm_field_int(dest, UVM_DEFAULT)
+		`uvm_field_int(rd, UVM_DEFAULT)
 		`uvm_field_int(reg_wr_data, UVM_DEFAULT|UVM_HEX)
 	`uvm_object_utils_end
 

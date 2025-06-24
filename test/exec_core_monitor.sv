@@ -41,7 +41,7 @@ class exec_core_monitor extends uvm_monitor;
 				tx = exec_core_message::type_id::create("tx", this);
 				tx.m_action  = REG_WR;
 				tx.pc = regfile_vif.pc;
-				tx.dest = regfile_vif.wr_addr;
+				tx.rd = regfile_vif.wr_addr;
 				tx.reg_wr_data = regfile_vif.wr_data;
 				m_ap.write(tx);
 			end
