@@ -55,7 +55,7 @@ module alu_stage(
 
 				// Reg-reg operations
 				end else if (id_ex_reg.alu_op == ALU_ADD) begin
-					ex_wb_reg.alu_result <= alu_reg_input_a + alu_reg_input_b;
+					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) + signed'(alu_reg_input_b);
 				end else if (id_ex_reg.alu_op == ALU_SUB) begin
 					ex_wb_reg.alu_result <= alu_reg_input_a - alu_reg_input_b;
 				end else if (id_ex_reg.alu_op == ALU_SLT) begin

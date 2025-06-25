@@ -25,8 +25,8 @@ import uvm_pkg::*;
 class exec_core_transaction extends uvm_sequence_item;
 
 	rand exec_core_cmd cmd;
-	rand bit is_reg_imm;
-	rand bit is_reg_reg;
+	bit is_reg_imm;
+	bit is_reg_reg;
 	rand bit[4:0] rs1;
 	rand bit[4:0] rs2;
 	rand bit[4:0] rd;
@@ -34,6 +34,15 @@ class exec_core_transaction extends uvm_sequence_item;
 
 	function new (string name = "");
 		super.new(name);
+	endfunction
+
+	function void post_randomize();
+		is_reg_imm = 0;
+		is_reg_reg = 0;
+		case (cmd) inside
+			CMD_ADDI, CMD_SLTI, CMD_SLTIU, CMD_XORI, CMD_ORI, CMD_ANDI: is_reg_imm = 1; 
+			CMD_ADD, CMD_SUB, CMD_SLL, CMD_SLT, CMD_SLTU, CMD_XOR, CMD_SRL, CMD_SRA, CMD_OR, CMD_AND: is_reg_reg = 1; 
+		endcase
 	endfunction
 
 	`uvm_object_utils_begin(exec_core_transaction)

@@ -54,7 +54,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ORI)
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ANDI)
 					begin
-						`uvm_error(get_type_name(), $sformatf("UNSUPPORTED REQUEST:%s", req.cmd.name))
+						`uvm_error(get_type_name(), $sformatf("UNSUPPORTED REQUEST:%s", req.sprint()))
 					end
 					inst_reg_imm.imm = req.imm;
 					inst_reg_imm.rs1 = req.rs1;
@@ -71,19 +71,34 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 					m_ap.write(action_received);
 				end else if (req.is_reg_reg) begin
 					reg_reg_inst inst_reg_reg;
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, ADD)
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SUB)
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SLL)
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SLT)
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SLTU)
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, XOR)
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SRL)
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SRA)
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, OR)
-				// `IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, AND)
-				// begin
-				// 	`uvm_warning(get_type_name(), $sformatf("Unimplemented command in transaction:\n%s", req.sprint()))
-				// end
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, ADD)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SUB)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SLL)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SLT)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SLTU)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, XOR)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SRL)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, SRA)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, OR)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_reg, AND)
+					begin
+						`uvm_warning(get_type_name(), $sformatf("Unimplemented command in transaction:\n%s", req.sprint()))
+					end
+
+					inst_reg_reg.rs1 = req.rs1;
+					inst_reg_reg.rs2 = req.rs2;
+					inst_reg_reg.rd = req.rd;
+					vif.rd_ram_data <= inst_reg_reg.encoded();
+					@(posedge vif.clk);
+
+					`uvm_info(get_type_name(), $sformatf("[%04h]: %s", vif.rd_ram_addr, inst_reg_reg.sprint()), UVM_MEDIUM)
+
+					action_received.pc = vif.rd_ram_addr;
+					action_received.rs1 = req.rs1;
+					action_received.rs2 = req.rs2;
+					action_received.rd = req.rd;
+					m_ap.write(action_received);
+
 				end
 
 			end

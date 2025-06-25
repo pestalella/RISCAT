@@ -92,6 +92,16 @@ class exec_core_scoreboard extends uvm_scoreboard;
 						tx.rd, signed'(expected_reg_inputs[tx.rd]), tx.rs1, expected_reg_inputs[tx.rs1], {{20{tx.imm[11]}}, tx.imm[11:0]}), UVM_MEDIUM)
 				end
 			end
+
+			else if (tx.m_action == INST_ADD) begin
+				tx.reg_wr_data = signed'(expected_reg_inputs[tx.rs1]) + signed'(expected_reg_inputs[tx.rs2]);
+				if (tx.rd != 0) begin
+					`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d)+r%1d(=%1d)",
+						tx.rd, signed'(expected_reg_inputs[tx.rd]), 
+						tx.rs1, signed'(expected_reg_inputs[tx.rs1]), 
+						tx.rs2, signed'(expected_reg_inputs[tx.rs2])), UVM_MEDIUM)
+				end
+			end
 			if (tx.rd != 0) begin
 					expected_reg_inputs[tx.rd] = tx.reg_wr_data;
 					`uvm_info(get_type_name(), $sformatf("r%1d =%1b",	tx.rd, expected_reg_inputs[tx.rd]), UVM_MEDIUM)
