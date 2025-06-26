@@ -110,6 +110,24 @@ class exec_core_scoreboard extends uvm_scoreboard;
 						tx.rs2, signed'(expected_reg_inputs[tx.rs2])), UVM_MEDIUM)
 				end
 			end
+			else if (tx.m_action == INST_SLT) begin
+				tx.reg_wr_data = (signed'(expected_reg_inputs[tx.rs1]) < signed'(expected_reg_inputs[tx.rs2]))? 1 : 0;
+				if (tx.rd != 0) begin
+					`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) < r%1d(=%1d)",
+						tx.rd, expected_reg_inputs[tx.rd], 
+						tx.rs1, signed'(expected_reg_inputs[tx.rs1]), 
+						tx.rs2, signed'(expected_reg_inputs[tx.rs2])), UVM_MEDIUM)
+				end
+			end
+			else if (tx.m_action == INST_SLTU) begin
+				tx.reg_wr_data = (expected_reg_inputs[tx.rs1] < expected_reg_inputs[tx.rs2])? 1 : 0;
+				if (tx.rd != 0) begin
+					`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) < r%1d(=%1d)",
+						tx.rd, expected_reg_inputs[tx.rd], 
+						tx.rs1, expected_reg_inputs[tx.rs1], 
+						tx.rs2, expected_reg_inputs[tx.rs2]), UVM_MEDIUM)
+				end
+			end
 			if (tx.rd != 0) begin
 					expected_reg_inputs[tx.rd] = tx.reg_wr_data;
 					`uvm_info(get_type_name(), $sformatf("r%1d =%1d",	tx.rd, signed'(expected_reg_inputs[tx.rd])), UVM_MEDIUM)

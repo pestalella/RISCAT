@@ -94,6 +94,15 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		begin
 			`uvm_do_with(req, { req.cmd == CMD_SUB;})
 		end
+
+		repeat(10)
+		begin
+			`uvm_do_with(req, { req.cmd == CMD_SLT;})
+		end
+		repeat(10)
+		begin
+			`uvm_do_with(req, { req.cmd == CMD_SLTU;})
+		end
 	// CMD_SUB,
 	// CMD_SLL,
 	// CMD_SLT,
