@@ -15,6 +15,8 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		// Perform an initial RESET to clean up the cpu state
 		`uvm_do_with(req, { req.cmd == CMD_RESET; })
 
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 1; req.rs1 == 0; req.imm == 10;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 1; req.imm == 10;})
 		repeat(10)
 		begin
 			`uvm_do_with(req, { req.cmd == CMD_ADDI;})
@@ -72,7 +74,26 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		`uvm_do_with(req, { req.cmd == CMD_ADD; req.rd == 3; req.rs1 == 1; req.rs2 == 1;})
 		`uvm_do_with(req, { req.cmd == CMD_ADD; req.rd == 4; req.rs1 == 2; req.rs2 == 2;})
 
-	// CMD_ADD,
+		repeat(10)
+		begin
+			`uvm_do_with(req, { req.cmd == CMD_ADD;})
+		end
+
+		`uvm_do_with(req, { req.cmd == CMD_RESET; })
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 1; req.rs1 == 0; req.imm == 10;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 0; req.imm == 'b111111110110;})  // -10
+		`uvm_do_with(req, { req.cmd == CMD_SUB; req.rd == 3; req.rs1 == 1; req.rs2 == 1;})
+		`uvm_do_with(req, { req.cmd == CMD_SUB; req.rd == 4; req.rs1 == 1; req.rs2 == 3;})
+		`uvm_do_with(req, { req.cmd == CMD_SUB; req.rd == 4; req.rs1 == 1; req.rs2 == 2;})
+
+// 		// r1 = r0 + 10 (10)
+// 		// r3 = r1 - r1 ( 0)
+// 		// r4 = r1 - r3 (10)
+
+		repeat(100)
+		begin
+			`uvm_do_with(req, { req.cmd == CMD_SUB;})
+		end
 	// CMD_SUB,
 	// CMD_SLL,
 	// CMD_SLT,

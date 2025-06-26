@@ -40,14 +40,14 @@ module exec_unit (
 	EX_WB ex_wb_reg;
 
 	logic wb_wr_en;
-  logic [4:0] wb_wr_addr;
-  logic [31:0] wb_wr_data;
+	logic [4:0] wb_wr_addr;
+	logic [31:0] wb_wr_data;
 
-	logic [31:0] regfile_rd0;
-	logic [31:0] regfile_rd1;
+	logic [31:0] regfile_rs1;
+	logic [31:0] regfile_rs2;
 
-	logic raw_hazard_0;
-	logic raw_hazard_1;
+	logic raw_hazard_rs1;
+	logic raw_hazard_rs2;
 
 
 	fetch_unit instruction_fetch(
@@ -60,8 +60,8 @@ module exec_unit (
 	);
 
 	always_ff @(posedge clk) begin
-		raw_hazard_0 <= ((if_id_reg.fetched_inst[11:7] != 0) && (id_ex_reg.reg_wr_addr != 0) && (id_ex_reg.reg_wr_addr == if_id_reg.fetched_inst[24:20]));
-		raw_hazard_1 <= ((if_id_reg.fetched_inst[11:7] != 0) && (id_ex_reg.reg_wr_addr != 0) && (id_ex_reg.reg_wr_addr == if_id_reg.fetched_inst[19:15]));
+		raw_hazard_rs1 <= ((if_id_reg.fetched_inst[11:7] != 0) && (id_ex_reg.reg_wr_addr != 0) && (id_ex_reg.reg_wr_addr == if_id_reg.fetched_inst[19:15]));
+		raw_hazard_rs2 <= ((if_id_reg.fetched_inst[11:7] != 0) && (id_ex_reg.reg_wr_addr != 0) && (id_ex_reg.reg_wr_addr == if_id_reg.fetched_inst[24:20]));
 	end
 
 	decode_unit instruction_decode(
@@ -74,12 +74,12 @@ module exec_unit (
 	register32bit_file registers(
 		.clk(clk),
 		.reset_n(reset_n),
-		.rd0_en(id_ex_reg.reg_rd0_en),
-		.rd0_addr(id_ex_reg.reg_rd0_addr),
-		.rd0_data(regfile_rd0),
-		.rd1_en(id_ex_reg.reg_rd1_en),
-		.rd1_addr(id_ex_reg.reg_rd1_addr),
-		.rd1_data(regfile_rd1),
+		.rd0_en(id_ex_reg.reg_rs1_en),
+		.rd0_addr(id_ex_reg.reg_rs1_addr),
+		.rd0_data(regfile_rs1),
+		.rd1_en(id_ex_reg.reg_rs2_en),
+		.rd1_addr(id_ex_reg.reg_rs2_addr),
+		.rd1_data(regfile_rs2),
 		.wr_en(wb_wr_en),
 		.wr_addr(wb_wr_addr),
 		.wr_data(wb_wr_data)
@@ -88,8 +88,8 @@ module exec_unit (
 	wire [31:0] alu_reg_input_a;
 	wire [31:0] alu_reg_input_b;
 
-	assign alu_reg_input_a = raw_hazard_0? ex_wb_reg.alu_result : regfile_rd0;
-	assign alu_reg_input_b = raw_hazard_1? ex_wb_reg.alu_result : regfile_rd1;
+	assign alu_reg_input_a = raw_hazard_rs1? ex_wb_reg.alu_result : regfile_rs1;
+	assign alu_reg_input_b = raw_hazard_rs2? ex_wb_reg.alu_result : regfile_rs2;
 
 	alu_stage arithmetic_logic_unit(
 		.clk(clk),

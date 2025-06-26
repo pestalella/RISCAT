@@ -41,23 +41,23 @@ module alu_stage(
 			end else begin
 				// Reg-imm operations
 				if (id_ex_reg.alu_op == ALU_ADDI) begin
-					ex_wb_reg.alu_result <= id_ex_reg.inst_imm + alu_reg_input_b;
+					ex_wb_reg.alu_result <=  alu_reg_input_a + signed'(id_ex_reg.inst_imm_sgn);
 				end else if (id_ex_reg.alu_op == ALU_SLTI) begin
-					ex_wb_reg.alu_result <= (signed'(alu_reg_input_b) < signed'(id_ex_reg.inst_imm_sgn))? 1 : 0;
+					ex_wb_reg.alu_result <= (signed'(alu_reg_input_a) < signed'(id_ex_reg.inst_imm_sgn))? 1 : 0;
 				end else if (id_ex_reg.alu_op == ALU_SLTIU) begin
-					ex_wb_reg.alu_result <= (alu_reg_input_b < id_ex_reg.inst_imm_sgn)? 1 : 0;
+					ex_wb_reg.alu_result <= (signed'(alu_reg_input_a) < id_ex_reg.inst_imm_sgn)? 1 : 0;
 				end else if (id_ex_reg.alu_op == ALU_XORI) begin
-					ex_wb_reg.alu_result <= alu_reg_input_b ^ id_ex_reg.inst_imm_sgn;
+					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) ^ id_ex_reg.inst_imm_sgn;
 				end else if (id_ex_reg.alu_op == ALU_ORI) begin
-					ex_wb_reg.alu_result <= alu_reg_input_b | id_ex_reg.inst_imm_sgn;
+					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) | id_ex_reg.inst_imm_sgn;
 				end else if (id_ex_reg.alu_op == ALU_ANDI) begin
-					ex_wb_reg.alu_result <= alu_reg_input_b & id_ex_reg.inst_imm_sgn;
+					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) & id_ex_reg.inst_imm_sgn;
 
 				// Reg-reg operations
 				end else if (id_ex_reg.alu_op == ALU_ADD) begin
 					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) + signed'(alu_reg_input_b);
 				end else if (id_ex_reg.alu_op == ALU_SUB) begin
-					ex_wb_reg.alu_result <= alu_reg_input_a - alu_reg_input_b;
+					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) - signed'(alu_reg_input_b);
 				end else if (id_ex_reg.alu_op == ALU_SLT) begin
 					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) < signed'(alu_reg_input_b);
 				end else if (id_ex_reg.alu_op == ALU_SLTU) begin
