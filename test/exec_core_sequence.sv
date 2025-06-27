@@ -86,10 +86,6 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		`uvm_do_with(req, { req.cmd == CMD_SUB; req.rd == 4; req.rs1 == 1; req.rs2 == 3;})
 		`uvm_do_with(req, { req.cmd == CMD_SUB; req.rd == 4; req.rs1 == 1; req.rs2 == 2;})
 
-// 		// r1 = r0 + 10 (10)
-// 		// r3 = r1 - r1 ( 0)
-// 		// r4 = r1 - r3 (10)
-
 		repeat(100)
 		begin
 			`uvm_do_with(req, { req.cmd == CMD_SUB;})
@@ -103,13 +99,30 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		begin
 			`uvm_do_with(req, { req.cmd == CMD_SLTU;})
 		end
-	// CMD_SUB,
-	// CMD_SLL,
-	// CMD_SLT,
-	// CMD_SLTU,
+
+
+		`uvm_do_with(req, { req.cmd == CMD_RESET; })
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 1; req.rs1 == 0; req.imm == 10;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 0; req.imm == 1;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 3; req.rs1 == 0; req.imm == 30;})
+		`uvm_do_with(req, { req.cmd == CMD_SLL; req.rd == 10; req.rs1 == 1; req.rs2 == 2;})
+		`uvm_do_with(req, { req.cmd == CMD_SLL; req.rd == 11; req.rs1 == 10; req.rs2 == 3;})
+
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 1; req.rs1 == 0; req.imm == 10;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 0; req.imm == 1;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 3; req.rs1 == 0; req.imm == 20;})
+		`uvm_do_with(req, { req.cmd == CMD_SRL; req.rd == 10; req.rs1 == 1; req.rs2 == 2;})
+		`uvm_do_with(req, { req.cmd == CMD_SLL; req.rd == 11; req.rs1 == 10; req.rs2 == 3;})
+		`uvm_do_with(req, { req.cmd == CMD_SRL; req.rd == 12; req.rs1 == 11; req.rs2 == 1;})
+		`uvm_do_with(req, { req.cmd == CMD_SRL; req.rd == 13; req.rs1 == 12; req.rs2 == 3;})
+
+
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 1; req.rs1 == 0; req.imm == 'b111111110110;})  // -10
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 0; req.imm == 1;})
+		`uvm_do_with(req, { req.cmd == CMD_SLL; req.rd == 3; req.rs1 == 1; req.rs2 == 2;})
+		`uvm_do_with(req, { req.cmd == CMD_SRA; req.rd == 4; req.rs1 == 3; req.rs2 == 2;})
+
 	// CMD_XOR,
-	// CMD_SRL,
-	// CMD_SRA,
 	// CMD_OR,
 	// CMD_AND
 
