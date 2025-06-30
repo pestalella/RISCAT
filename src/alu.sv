@@ -18,10 +18,16 @@ module alu_stage(
 	logic [31:0] sll_result;
 	logic [31:0] srl_result;
 	logic [31:0] sra_result;
+;
+	logic is_reg_imm_shift;
+	logic [4:0] shift_amount;
+	
+	assign is_reg_imm_shift = id_ex_reg.alu_op == ALU_SLLI | id_ex_reg.alu_op == ALU_SRLI | id_ex_reg.alu_op == ALU_SRAI;
+    assign shift_amount = is_reg_imm_shift ? id_ex_reg.shamt : alu_reg_input_b[4:0];
 
 	shifter shifter_unit(
 		.input_value(alu_reg_input_a),
-		.amount(alu_reg_input_b[4:0]),
+		.amount(shift_amount),
 		.logic_left_shift(sll_result),
 		.logic_right_shift(srl_result),
 		.arithmetic_right_shift(sra_result)
@@ -52,6 +58,12 @@ module alu_stage(
 					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) | id_ex_reg.inst_imm_sgn;
 				end else if (id_ex_reg.alu_op == ALU_ANDI) begin
 					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) & id_ex_reg.inst_imm_sgn;
+				end else if (id_ex_reg.alu_op == ALU_SLLI) begin
+					ex_wb_reg.alu_result <= sll_result;
+				end else if (id_ex_reg.alu_op == ALU_SRLI) begin
+					ex_wb_reg.alu_result <= srl_result;
+				end else if (id_ex_reg.alu_op == ALU_SRAI) begin
+					ex_wb_reg.alu_result <= sra_result;
 
 				// Reg-reg operations
 				end else if (id_ex_reg.alu_op == ALU_ADD) begin

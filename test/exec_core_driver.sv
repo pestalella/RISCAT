@@ -50,6 +50,9 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ADDI)
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, SLTI)
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, SLTIU)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, SLLI)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, SRLI)
+					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, SRAI)
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, XORI)
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ORI)
 					`IF_CREATE_INSTRUCTION_ELSE(inst_reg_imm, ANDI)
@@ -59,6 +62,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 					inst_reg_imm.imm = req.imm;
 					inst_reg_imm.rs1 = req.rs1;
 					inst_reg_imm.rd = req.rd;
+					inst_reg_imm.shamt = req.shamt;
 					vif.rd_ram_data <= inst_reg_imm.encoded();
 					@(posedge vif.clk);
 
@@ -68,6 +72,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 					action_received.imm = req.imm;
 					action_received.rs1 = req.rs1;
 					action_received.rd = req.rd;
+					action_received.shamt = req.shamt;
 					m_ap.write(action_received);
 				end else if (req.is_reg_reg) begin
 					reg_reg_inst inst_reg_reg;

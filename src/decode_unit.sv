@@ -21,6 +21,9 @@ module decode_unit(
 	logic is_xori;
 	logic is_ori;
 	logic is_andi;
+	logic is_slli;
+	logic is_srli;
+	logic is_srai;
 
 	logic is_add;
 	logic is_sub;
@@ -39,9 +42,12 @@ module decode_unit(
 	assign inst_f7 = if_id_reg.fetched_inst[31:25];
 
 	assign is_addi  = is_reg_imm_inst && (inst_f3 == 'b000);
+	assign is_slli  = is_reg_imm_inst && (inst_f3 == 'b001);
 	assign is_slti  = is_reg_imm_inst && (inst_f3 == 'b010);
 	assign is_sltiu = is_reg_imm_inst && (inst_f3 == 'b011);
 	assign is_xori  = is_reg_imm_inst && (inst_f3 == 'b100);
+	assign is_srli =  is_reg_imm_inst && (inst_f3 == 'b101);
+	assign is_srai =  is_reg_imm_inst && (inst_f7 == 'b0100000) && (inst_f3 == 'b101);
 	assign is_ori   = is_reg_imm_inst && (inst_f3 == 'b110);
 	assign is_andi  = is_reg_imm_inst && (inst_f3 == 'b111);
 
@@ -77,24 +83,28 @@ module decode_unit(
 			id_ex_reg.reg_wr_en <= is_reg_imm_inst | is_reg_reg_inst;
 			id_ex_reg.inst_imm <= is_reg_imm_inst? {{20{if_id_reg.fetched_inst[31]}}, if_id_reg.fetched_inst[31:20]} : 32'b0;
 			id_ex_reg.inst_imm_sgn <= is_reg_imm_inst? {{20{if_id_reg.fetched_inst[31]}}, if_id_reg.fetched_inst[31:20]} : 0;
+			id_ex_reg.shamt = if_id_reg.fetched_inst[24:20];
 			id_ex_reg.alu_op <= is_addi?  ALU_ADDI : (
-													is_slti?  ALU_SLTI : (
-													is_sltiu? ALU_SLTIU : (
-													is_xori?  ALU_XORI : (
-													is_ori?   ALU_ORI : (
-													is_andi?  ALU_ANDI : (
+								is_slti?  ALU_SLTI : (
+								is_sltiu? ALU_SLTIU : (
+								is_slli?  ALU_SLLI : (
+								is_srli?  ALU_SRLI : (
+								is_srai?  ALU_SRAI : (
+								is_xori?  ALU_XORI : (
+								is_ori?   ALU_ORI : (
+								is_andi?  ALU_ANDI : (
 
-													is_add?   ALU_ADD : (
-													is_sub?   ALU_SUB : (
-													is_sll?   ALU_SLL : (
-													is_slt?   ALU_SLT : (
-													is_sltu?  ALU_SLTU : (
-													is_xor?   ALU_XOR : (
-													is_srl?   ALU_SRL : (
-													is_sra?   ALU_SRA : (
-													is_or?    ALU_OR : (
-													is_and?   ALU_AND : ALU_NONE
-				)))))))))))))));
+								is_add?   ALU_ADD : (
+								is_sub?   ALU_SUB : (
+								is_sll?   ALU_SLL : (
+								is_slt?   ALU_SLT : (
+								is_sltu?  ALU_SLTU : (
+								is_xor?   ALU_XOR : (
+								is_srl?   ALU_SRL : (
+								is_sra?   ALU_SRA : (
+								is_or?    ALU_OR : (
+								is_and?   ALU_AND : ALU_NONE
+				))))))))))))))))));
 		end
 	end
 endmodule

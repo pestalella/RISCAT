@@ -6,6 +6,9 @@ typedef enum {
 	RESET,
 	REG_WR,
 	INST_ADDI,
+	INST_SLLI,
+	INST_SRLI,
+	INST_SRAI,
 	INST_SLTI,
 	INST_SLTIU,
 	INST_XORI,
@@ -35,6 +38,7 @@ class exec_core_message extends uvm_sequence_item;
 	bit[4:0] rs1;
 	bit[4:0] rs2;
 	bit[4:0] rd;
+	bit[4:0] shamt;
 	bit[31:0] reg_wr_data;
 
 	function new (string name = "");
@@ -48,6 +52,7 @@ class exec_core_message extends uvm_sequence_item;
 		`uvm_field_int(rs1, UVM_DEFAULT)
 		`uvm_field_int(rs2, UVM_DEFAULT)
 		`uvm_field_int(rd, UVM_DEFAULT)
+		`uvm_field_int(shamt, UVM_DEFAULT)
 		`uvm_field_int(reg_wr_data, UVM_DEFAULT|UVM_HEX)
 	`uvm_object_utils_end
 

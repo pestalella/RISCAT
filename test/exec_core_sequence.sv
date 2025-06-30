@@ -122,15 +122,32 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		`uvm_do_with(req, { req.cmd == CMD_SLL; req.rd == 3; req.rs1 == 1; req.rs2 == 2;})
 		`uvm_do_with(req, { req.cmd == CMD_SRA; req.rd == 4; req.rs1 == 3; req.rs2 == 2;})
 
-	// CMD_XOR,
-	// CMD_OR,
-	// CMD_AND
+		`uvm_do_with(req, { req.cmd == CMD_RESET; })
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 1; req.rs1 == 0; req.imm == 10;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 0; req.imm == 1;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 3; req.rs1 == 0; req.imm == 30;})
+		`uvm_do_with(req, { req.cmd == CMD_SLLI; req.rd == 10; req.rs1 == 1; req.shamt == 2;})
+		`uvm_do_with(req, { req.cmd == CMD_SLLI; req.rd == 11; req.rs1 == 10; req.shamt == 3;})
+
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 1; req.rs1 == 0; req.imm == 10;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 0; req.imm == 1;})
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 3; req.rs1 == 0; req.imm == 20;})
+		`uvm_do_with(req, { req.cmd == CMD_SRLI; req.rd == 10; req.rs1 == 1; req.shamt == 2;})
+		`uvm_do_with(req, { req.cmd == CMD_SLLI; req.rd == 11; req.rs1 == 10; req.shamt == 3;})
+		`uvm_do_with(req, { req.cmd == CMD_SRLI; req.rd == 12; req.rs1 == 11; req.shamt == 1;})
+		`uvm_do_with(req, { req.cmd == CMD_SRLI; req.rd == 13; req.rs1 == 12; req.shamt == 3;})
 
 
-		// repeat(1000)
-		// begin
-		// 		`uvm_do_with(req, { req.cmd != CMD_RESET;})
-		// end
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 1; req.rs1 == 0; req.imm == 'b111111110110;})  // -10
+		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 0; req.imm == 1;})
+		`uvm_do_with(req, { req.cmd == CMD_SLLI; req.rd == 3; req.rs1 == 1; req.shamt == 2;})
+		`uvm_do_with(req, { req.cmd == CMD_SRAI; req.rd == 4; req.rs1 == 3; req.shamt == 2;})
+
+
+		repeat(1000)
+		begin
+				`uvm_do_with(req, { req.cmd != CMD_RESET;})
+		end
 
 		// Epilogue to drain all the `previous intructions
 		repeat(10)

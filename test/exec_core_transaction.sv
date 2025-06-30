@@ -6,6 +6,9 @@ typedef enum {
 	CMD_XORI,
 	CMD_ORI,
 	CMD_ANDI,
+	CMD_SLLI,
+	CMD_SRLI,
+	CMD_SRAI,
 	CMD_ADD,
 	CMD_SUB,
 	CMD_SLL,
@@ -22,7 +25,7 @@ typedef enum {
 
 import uvm_pkg::*;
 
-class exec_core_transaction extends uvm_sequence_item;
+class 	exec_core_transaction extends uvm_sequence_item;
 
 	rand exec_core_cmd cmd;
 	bit is_reg_imm;
@@ -31,6 +34,7 @@ class exec_core_transaction extends uvm_sequence_item;
 	rand bit[4:0] rs2;
 	rand bit[4:0] rd;
 	rand bit[11:0] imm;
+	rand bit [4:0] shamt;
 
 	function new (string name = "");
 		super.new(name);
@@ -40,7 +44,7 @@ class exec_core_transaction extends uvm_sequence_item;
 		is_reg_imm = 0;
 		is_reg_reg = 0;
 		case (cmd) inside
-			CMD_ADDI, CMD_SLTI, CMD_SLTIU, CMD_XORI, CMD_ORI, CMD_ANDI: is_reg_imm = 1; 
+			CMD_ADDI, CMD_SLTI, CMD_SLTIU, CMD_XORI, CMD_ORI, CMD_ANDI, CMD_SLLI, CMD_SRLI, CMD_SRAI: is_reg_imm = 1; 
 			CMD_ADD, CMD_SUB, CMD_SLL, CMD_SLT, CMD_SLTU, CMD_XOR, CMD_SRL, CMD_SRA, CMD_OR, CMD_AND: is_reg_reg = 1; 
 		endcase
 	endfunction

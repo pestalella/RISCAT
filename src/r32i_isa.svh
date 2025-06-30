@@ -8,6 +8,9 @@ typedef enum {
 	XORI,
 	ORI,
 	ANDI,
+	SLLI,
+	SRLI,
+	SRAI,
 	ADD,
 	SUB,
 	SLL,
@@ -31,9 +34,10 @@ class riscv_instruction;
 endclass
 
 class reg_imm_inst extends riscv_instruction;
-	rand bit[11:0] imm;
-	rand bit[4:0] rs1;
-	rand bit[4:0] rd;
+	rand bit [11:0] imm;
+	rand bit [4:0] rs1;
+	rand bit [4:0] rd;
+	rand bit [4:0] shamt;
 
 	function new(instruction inst);
 		super.new(inst);
@@ -41,12 +45,18 @@ class reg_imm_inst extends riscv_instruction;
 		opcode = 7'b0010011;
 		if (inst == ADDI) begin
 			funct3 = 3'b000;
+		end else if (inst == SLLI) begin
+			funct3 = 3'b001;
 		end else if (inst == SLTI) begin
 			funct3 = 3'b010;
 		end else if (inst == SLTIU) begin
 			funct3 = 3'b011;
 		end else if (inst == XORI) begin
 			funct3 = 3'b100;
+		end else if (inst == SRLI) begin
+			funct3 = 3'b101;
+		end else if (inst == SRAI) begin
+			funct3 = 3'b101;
 		end else if (inst == ORI) begin
 			funct3 = 3'b110;
 		end else if (inst == ANDI) begin
@@ -55,11 +65,19 @@ class reg_imm_inst extends riscv_instruction;
 	endfunction
 
 	function string sprint();
-		return $sformatf("%s r%1d, r%1d, %1d", op.name, rd, rs1,  signed'({{20{imm[11]}}, imm[11:0]}));
+		if (op == SLLI || op == SRLI || op == SRAI)
+			return $sformatf("%s r%1d, r%1d, %1d", op.name, rd, rs1,  shamt);
+		else
+			return $sformatf("%s r%1d, r%1d, %1d", op.name, rd, rs1,  signed'({{20{imm[11]}}, imm[11:0]}));
 	endfunction
 
 	function bit[31:0] encoded();
-		return {>>{imm, rs1, funct3, rd, opcode}};
+		if (op == SLLI || op == SRLI)
+			return {>>{7'b0000000, shamt, rs1, funct3, rd, opcode}};
+		else  if (op == SRAI)
+			return {>>{7'b0100000, shamt, rs1, funct3, rd, opcode}};
+		else
+			return {>>{imm, rs1, funct3, rd, opcode}};
 	endfunction
 endclass
 

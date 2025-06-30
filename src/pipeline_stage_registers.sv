@@ -18,6 +18,7 @@ typedef struct packed {
 
 	logic [31:0] inst_imm;
 	logic [31:0] inst_imm_sgn;
+	logic [4:0] shamt;
 
 	alu_command_t alu_op;
 } ID_EX;
