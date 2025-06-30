@@ -1,5 +1,5 @@
 `include "../src/r32i_isa.svh"
-`include "exec_core_action.sv"
+`include "exec_core_message.sv"
 `include "exec_unit_probe_if.sv"
 
 `define IF_CREATE_INSTRUCTION_ELSE(result, inst_name) \

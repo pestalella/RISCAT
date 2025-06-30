@@ -5,6 +5,7 @@
 typedef enum {
 	RESET,
 	REG_WR,
+	// ALU instructions
 	INST_ADDI,
 	INST_SLLI,
 	INST_SRLI,
@@ -23,7 +24,9 @@ typedef enum {
 	INST_SRL,
 	INST_SRA,
 	INST_OR,
-	INST_AND
+	INST_AND,
+	// Unconditional jumps
+	INST_JAL
 } exec_core_action;
 
 `include "uvm_macros.svh"
