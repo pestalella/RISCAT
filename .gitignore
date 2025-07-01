@@ -99,4 +99,5 @@ RISCAT.sim
 RISCAT.cache
 RISCAT.hw
 RISCAT.ip_user_files
-
+RISCAT.runs
+.Xil/
