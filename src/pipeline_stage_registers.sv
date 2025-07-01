@@ -1,6 +1,8 @@
 `ifndef __PIPELINE_STAGE_REGISTERS__
 `define __PIPELINE_STAGE_REGISTERS__
 
+`include "alu_enums.svh"
+
 typedef struct packed {
 	logic [31:0] pc;
 	logic [31:0] fetched_inst;
