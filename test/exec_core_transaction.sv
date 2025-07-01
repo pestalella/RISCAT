@@ -1,5 +1,6 @@
 typedef enum {
 	CMD_RESET,
+	// ALU instructions
 	CMD_ADDI,
 	CMD_SLTI,
 	CMD_SLTIU,
@@ -18,7 +19,9 @@ typedef enum {
 	CMD_SRL,
 	CMD_SRA,
 	CMD_OR,
-	CMD_AND
+	CMD_AND,
+	// Jumps
+	CMD_JAL
 } exec_core_cmd;
 
 `include "uvm_macros.svh"
@@ -34,6 +37,7 @@ class 	exec_core_transaction extends uvm_sequence_item;
 	rand bit[4:0] rs2;
 	rand bit[4:0] rd;
 	rand bit[11:0] imm;
+	rand bit[20:0] jump_offset;
 	rand bit [4:0] shamt;
 
 	function new (string name = "");

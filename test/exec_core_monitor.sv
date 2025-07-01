@@ -9,8 +9,11 @@ class exec_core_monitor extends uvm_monitor;
 
 	uvm_analysis_port #(exec_core_message) m_ap;
 
+	logic [31:0] last_pc;
+
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
+		last_pc = '0;
 	endfunction
 
 	function void build_phase(uvm_phase phase);
@@ -45,6 +48,15 @@ class exec_core_monitor extends uvm_monitor;
 				tx.reg_wr_data = regfile_vif.wr_data;
 				m_ap.write(tx);
 			end
+			// REVISIT: This will not detect jumps to itself and jumps to the next instruction
+			if (execunit_vif.reset_n && execunit_vif.pc != last_pc && execunit_vif.pc != last_pc + 4) begin
+				`uvm_info(get_type_name(), $sformatf("Detected a jump from PC=%1d to PC=%1d", last_pc, execunit_vif.pc), UVM_MEDIUM);
+				tx = exec_core_message::type_id::create("tx", this);
+				tx.m_action  = JUMP;
+				tx.pc = execunit_vif.pc;
+				m_ap.write(tx);
+			end
+			last_pc = execunit_vif.pc;
 		end
 	endtask
 

@@ -9,12 +9,7 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		super.new(name);
 	endfunction
 
-	task body;
-
-		`uvm_info(get_type_name(), "Sequence start", UVM_MEDIUM)
-		// Perform an initial RESET to clean up the cpu state
-		`uvm_do_with(req, { req.cmd == CMD_RESET; })
-
+	task do_alu_items;
 		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 1; req.rs1 == 0; req.imm == 10;})
 		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 1; req.imm == 10;})
 		repeat(10)
@@ -142,14 +137,26 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 2; req.rs1 == 0; req.imm == 1;})
 		`uvm_do_with(req, { req.cmd == CMD_SLLI; req.rd == 3; req.rs1 == 1; req.shamt == 2;})
 		`uvm_do_with(req, { req.cmd == CMD_SRAI; req.rd == 4; req.rs1 == 3; req.shamt == 2;})
+	endtask
+
+	task body;
+		`uvm_info(get_type_name(), "Sequence start", UVM_MEDIUM)
+		// Perform an initial RESET to clean up the cpu state
+		`uvm_do_with(req, { req.cmd == CMD_RESET; })
+
+//		do_alu_items();
+
+		`uvm_do_with(req, { req.cmd == CMD_JAL; req.jump_offset == 16;})
+
+		// repeat(1000)
+		// begin
+		// 		`uvm_do_with(req, { req.cmd != CMD_RESET;})
+		// end
 
 
-		repeat(1000)
-		begin
-				`uvm_do_with(req, { req.cmd != CMD_RESET;})
-		end
-
+		//////////////////////////////////////////////////
 		// Epilogue to drain all the `previous intructions
+		//////////////////////////////////////////////////
 		repeat(10)
 		begin
 			`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 0; req.rs1 == 0; req.imm == 0;})

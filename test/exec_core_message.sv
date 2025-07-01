@@ -26,7 +26,9 @@ typedef enum {
 	INST_OR,
 	INST_AND,
 	// Unconditional jumps
-	INST_JAL
+	INST_JAL,
+	// Observed jump
+	JUMP
 } exec_core_action;
 
 `include "uvm_macros.svh"
@@ -43,6 +45,7 @@ class exec_core_message extends uvm_sequence_item;
 	bit[4:0] rd;
 	bit[4:0] shamt;
 	bit[31:0] reg_wr_data;
+	bit[20:1] jump_offset;
 
 	function new (string name = "");
 		super.new(name);
@@ -57,6 +60,7 @@ class exec_core_message extends uvm_sequence_item;
 		`uvm_field_int(rd, UVM_DEFAULT)
 		`uvm_field_int(shamt, UVM_DEFAULT)
 		`uvm_field_int(reg_wr_data, UVM_DEFAULT|UVM_HEX)
+		`uvm_field_int(jump_offset, UVM_DEFAULT)
 	`uvm_object_utils_end
 
 endclass: exec_core_message

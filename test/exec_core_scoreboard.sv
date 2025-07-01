@@ -4,8 +4,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 	uvm_analysis_imp #(exec_core_message, exec_core_scoreboard) m_ap;
 
 	exec_core_message transactions[$];
+	bit[31:0] expected_jumps[$];
 
-	bit[31:0] regfile_copy [0:31];
 	bit[31:0] expected_reg_inputs [0:31];
 
 	`uvm_component_utils_begin(exec_core_scoreboard)
@@ -29,7 +29,6 @@ class exec_core_scoreboard extends uvm_scoreboard;
     tx.copy(t);
 	if (tx.m_action == RESET) begin
 		`uvm_info(get_type_name(), $sformatf("received a RESET action:\n%s", tx.sprint()), UVM_MEDIUM)
-		regfile_copy = '{default:0};
 		expected_reg_inputs = '{default:0};
 		transactions.delete();
 	end
@@ -44,12 +43,23 @@ class exec_core_scoreboard extends uvm_scoreboard;
 					$sformatf("received a write to r%1d, was expecting a write to r%1d", tx.rd, saved_transaction.rd))
 
 			assert (signed'(tx.reg_wr_data) == signed'(saved_transaction.reg_wr_data))
-				regfile_copy[tx.rd] = saved_transaction.reg_wr_data;
 			else
 				`uvm_error(get_type_name(),
 					$sformatf("received a write to r%1d, expected value was %1d, received %1d instead.\nReceived transaction:\n%sSaved transaction:\n%s",
 						tx.rd, signed'(saved_transaction.reg_wr_data), signed'(tx.reg_wr_data), tx.sprint(), saved_transaction.sprint()))
 		end
+	end
+	else if (tx.m_action == JUMP) begin
+		bit[31:0] expected_pc = expected_jumps.pop_front();
+		`uvm_info(get_type_name(), "A jump happened", UVM_MEDIUM)
+		assert (tx.pc == expected_pc) else
+			`uvm_fatal(get_type_name(),
+				$sformatf("Expcted PC=%1d. Actual PC=%1d", expected_pc, tx.pc))
+	end
+	else if (tx.m_action == INST_JAL) begin
+		bit[31:0] target = tx.pc +  signed'(tx.jump_offset);
+		`uvm_info(get_type_name(), $sformatf("A jump to address %1d will happen", target), UVM_MEDIUM)
+		expected_jumps.push_back(target);
 	end	else begin
 		if (tx.m_action == INST_ADDI) begin
 			tx.reg_wr_data = signed'(expected_reg_inputs[tx.rs1]) + signed'({{20{tx.imm[11]}}, tx.imm[11:0]});
@@ -97,8 +107,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = signed'(expected_reg_inputs[tx.rs1]) + signed'(expected_reg_inputs[tx.rs2]);
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d)+r%1d(=%1d)",
-					tx.rd, signed'(expected_reg_inputs[tx.rd]), 
-					tx.rs1, signed'(expected_reg_inputs[tx.rs1]), 
+					tx.rd, signed'(expected_reg_inputs[tx.rd]),
+					tx.rs1, signed'(expected_reg_inputs[tx.rs1]),
 					tx.rs2, signed'(expected_reg_inputs[tx.rs2])), UVM_MEDIUM)
 			end
 		end
@@ -106,8 +116,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = signed'(expected_reg_inputs[tx.rs1]) - signed'(expected_reg_inputs[tx.rs2]);
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d)-r%1d(=%1d)",
-					tx.rd, signed'(expected_reg_inputs[tx.rd]), 
-					tx.rs1, signed'(expected_reg_inputs[tx.rs1]), 
+					tx.rd, signed'(expected_reg_inputs[tx.rd]),
+					tx.rs1, signed'(expected_reg_inputs[tx.rs1]),
 					tx.rs2, signed'(expected_reg_inputs[tx.rs2])), UVM_MEDIUM)
 			end
 		end
@@ -115,8 +125,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = (signed'(expected_reg_inputs[tx.rs1]) < signed'(expected_reg_inputs[tx.rs2]))? 1 : 0;
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) < r%1d(=%1d)",
-					tx.rd, expected_reg_inputs[tx.rd], 
-					tx.rs1, signed'(expected_reg_inputs[tx.rs1]), 
+					tx.rd, expected_reg_inputs[tx.rd],
+					tx.rs1, signed'(expected_reg_inputs[tx.rs1]),
 					tx.rs2, signed'(expected_reg_inputs[tx.rs2])), UVM_MEDIUM)
 			end
 		end
@@ -124,8 +134,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = (expected_reg_inputs[tx.rs1] < expected_reg_inputs[tx.rs2])? 1 : 0;
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) < r%1d(=%1d)",
-					tx.rd, expected_reg_inputs[tx.rd], 
-					tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, expected_reg_inputs[tx.rd],
+					tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.rs2, expected_reg_inputs[tx.rs2]), UVM_MEDIUM)
 			end
 		end
@@ -133,8 +143,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.rs1] << expected_reg_inputs[tx.rs2][4:0];
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) << r%1d(=%1d)",
-					tx.rd, expected_reg_inputs[tx.rd], 
-					tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, expected_reg_inputs[tx.rd],
+					tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.rs2, expected_reg_inputs[tx.rs2][4:0]), UVM_MEDIUM)
 			end
 		end
@@ -142,8 +152,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.rs1] >> expected_reg_inputs[tx.rs2][4:0];
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) >> r%1d(=%1d)",
-					tx.rd, expected_reg_inputs[tx.rd], 
-					tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, expected_reg_inputs[tx.rd],
+					tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.rs2, expected_reg_inputs[tx.rs2][4:0]), UVM_MEDIUM)
 			end
 		end
@@ -151,8 +161,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.rs1] >>> expected_reg_inputs[tx.rs2][4:0];
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) >>> r%1d(=%1d)",
-					tx.rd, expected_reg_inputs[tx.rd], 
-					tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, expected_reg_inputs[tx.rd],
+					tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.rs2, expected_reg_inputs[tx.rs2][4:0]), UVM_MEDIUM)
 			end
 		end
@@ -160,8 +170,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.rs1] << tx.shamt;
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) << %1d",
-					tx.rd, expected_reg_inputs[tx.rd], 
-					tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, expected_reg_inputs[tx.rd],
+					tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.shamt), UVM_MEDIUM)
 			end
 		end
@@ -169,8 +179,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.rs1] >> tx.shamt;
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) >> %1d",
-					tx.rd, expected_reg_inputs[tx.rd], 
-					tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, expected_reg_inputs[tx.rd],
+					tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.shamt), UVM_MEDIUM)
 			end
 		end
@@ -178,8 +188,8 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.rs1] >>> tx.shamt;
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) >>> %1d",
-					tx.rd, expected_reg_inputs[tx.rd], 
-					tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, expected_reg_inputs[tx.rd],
+					tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.shamt), UVM_MEDIUM)
 			end
 		end
@@ -187,7 +197,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.rs1] & expected_reg_inputs[tx.rs2];
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1b) = r%1d(=%1b) & r%1d(%1b)",
-					tx.rd, signed'(expected_reg_inputs[tx.rd]), tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, signed'(expected_reg_inputs[tx.rd]), tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.rs2, expected_reg_inputs[tx.rs2]), UVM_MEDIUM)
 			end
 		end
@@ -195,7 +205,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.rs1] ^ expected_reg_inputs[tx.rs2];
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1b) = r%1d(=%1b) ^ r%1d(%1b)",
-					tx.rd, signed'(expected_reg_inputs[tx.rd]), tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, signed'(expected_reg_inputs[tx.rd]), tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.rs2, expected_reg_inputs[tx.rs2]), UVM_MEDIUM)
 			end
 		end
@@ -203,11 +213,10 @@ class exec_core_scoreboard extends uvm_scoreboard;
 			tx.reg_wr_data = expected_reg_inputs[tx.rs1] | expected_reg_inputs[tx.rs2];
 			if (tx.rd != 0) begin
 				`uvm_info(get_type_name(), $sformatf("r%1d(=%1b) = r%1d(=%1b) | r%1d(%1b)",
-					tx.rd, signed'(expected_reg_inputs[tx.rd]), tx.rs1, expected_reg_inputs[tx.rs1], 
+					tx.rd, signed'(expected_reg_inputs[tx.rd]), tx.rs1, expected_reg_inputs[tx.rs1],
 					tx.rs2, expected_reg_inputs[tx.rs2]), UVM_MEDIUM)
 			end
 		end
-
 		if (tx.rd != 0) begin
 				expected_reg_inputs[tx.rd] = tx.reg_wr_data;
 				`uvm_info(get_type_name(), $sformatf("r%1d =%1b",	tx.rd, signed'(expected_reg_inputs[tx.rd])), UVM_MEDIUM)
