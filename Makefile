@@ -6,6 +6,8 @@ XELAB=$(VIVADO_BIN_PATH)/xelab
 XVLOG=$(VIVADO_BIN_PATH)/xvlog
 XSIM=$(VIVADO_BIN_PATH)/xsim
 
+RANDOM := $(shell bash -c 'echo $$RANDOM')
+
 all: compile elab
 
 compile:
@@ -21,4 +23,4 @@ clean:
 
 simulate:
 	export LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):$(VIVADO_LIB_PATH); \
-	$(XSIM) top_behav -key Behavioral:sim_1:Functional:top -sv_seed 6 -log simulate.log -tclbatch top_sim.tcl
+	$(XSIM) top_behav -key Behavioral:sim_1:Functional:top -sv_seed $(RANDOM) -log simulate.log -tclbatch top_sim.tcl
