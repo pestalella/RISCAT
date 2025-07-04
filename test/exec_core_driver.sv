@@ -39,7 +39,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				vif.reset_n  <= 0;
 				@(posedge vif.clk);
 				vif.reset_n  <= 1;
-				vif.rd_ram_data <= '{default:0};
+//				vif.rd_ram_data <= '{default:0};
 				@(posedge vif.clk);  // wait a clock cycle to stabilize signals
 			end else if (req.cmd == CMD_JAL) begin
 				jal_inst jump_inst;
@@ -49,7 +49,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 				jump_inst.jump_offset = req.jump_offset;
 				jump_inst.rd = req.rd;
 
-				vif.rd_ram_data <= jump_inst.encoded();
+//				vif.rd_ram_data <= jump_inst.encoded();
 				@(posedge vif.clk);
 
 				`uvm_info(get_type_name(), $sformatf("[%04h]: %s", vif.rd_ram_addr, jump_inst.sprint()), UVM_MEDIUM)
@@ -81,7 +81,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 					inst_reg_imm.rd = req.rd;
 					inst_reg_imm.shamt = req.shamt;
 
-					vif.rd_ram_data <= inst_reg_imm.encoded();
+//					vif.rd_ram_data <= inst_reg_imm.encoded();
 					@(posedge vif.clk);
 
 					`uvm_info(get_type_name(), $sformatf("[%04h]: %s", vif.rd_ram_addr, inst_reg_imm.sprint()), UVM_MEDIUM)
@@ -111,7 +111,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 					inst_reg_reg.rs1 = req.rs1;
 					inst_reg_reg.rs2 = req.rs2;
 					inst_reg_reg.rd = req.rd;
-					vif.rd_ram_data <= inst_reg_reg.encoded();
+//					vif.rd_ram_data <= inst_reg_reg.encoded();
 					@(posedge vif.clk);
 
 					`uvm_info(get_type_name(), $sformatf("[%04h]: %s", vif.rd_ram_addr, inst_reg_reg.sprint()), UVM_MEDIUM)

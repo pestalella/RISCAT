@@ -11,7 +11,7 @@ class exec_core_agent extends uvm_agent;
 
 	exec_core_sequencer m_sequencer;
 	exec_core_driver    m_driver;
-  exec_core_monitor   m_monitor;
+	exec_core_monitor   m_monitor;
 
 	function new(string name, uvm_component parent);
 		super.new(name, parent);
@@ -24,7 +24,7 @@ class exec_core_agent extends uvm_agent;
 			m_sequencer = exec_core_sequencer::type_id::create("m_sequencer", this);
 			m_driver    = exec_core_driver::type_id::create("m_driver", this);
 		end
-    m_monitor     = exec_core_monitor::type_id::create("m_monitor", this);
+    m_monitor = exec_core_monitor::type_id::create("m_monitor", this);
 	endfunction
 
 	function void connect_phase(uvm_phase phase);

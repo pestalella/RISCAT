@@ -4,7 +4,7 @@
 
 package mem_pkg;
 
-  import uvm_pkg::*;
+	import uvm_pkg::*;
 
 	`include "mem_transaction.sv"
 	typedef uvm_sequencer #(mem_transaction) mem_sequencer;
@@ -14,6 +14,6 @@ package mem_pkg;
 	`include "mem_sequence.sv"
 	`include "mem_scoreboard.sv"
 	`include "mem_env.sv"
-  `include "mem_test.sv"
+	`include "mem_test.sv"
 
 endpackage: mem_pkg

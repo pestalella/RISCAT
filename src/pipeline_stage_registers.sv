@@ -4,13 +4,13 @@
 `include "alu_enums.svh"
 
 typedef struct packed {
-	logic [31:0] pc;
+	logic [15:0] pc;
 	logic [31:0] fetched_inst;
 } IF_ID;
 
 
 typedef struct packed {
-	logic [31:0] pc;
+	logic [15:0] pc;
 	logic [4:0] reg_rs1_addr;
 	logic [4:0] reg_rs2_addr;
 	logic [4:0] reg_wr_addr;
@@ -23,11 +23,14 @@ typedef struct packed {
 	logic [4:0] shamt;
 
 	alu_command_t alu_op;
+
+	logic [20:1] jump_offset;
+	logic is_jump;
 } ID_EX;
 
 
 typedef struct packed {
-	logic [31:0] pc;
+	logic [15:0] pc;
 	logic reg_wr_en;
 	logic [4:0] reg_wr_addr;
 	logic alu_result_ready;

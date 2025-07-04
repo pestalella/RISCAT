@@ -6,22 +6,30 @@
 module fetch_unit(
 	input logic clk,
 	input logic reset_n,
-	input logic [31:0] pc,
+	input logic [15:0] pc,
 	input logic [31:0] rd_ram_data,
 
-	output logic [31:0] rd_ram_addr,
+	output logic jump_was_fetched,
+	output logic [15:0] rd_ram_addr,
 	output IF_ID if_id_reg
-	);
+);
 
 	always_ff @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
-				rd_ram_addr <= '{default:0};
-				fetched_inst_r <= '{default:0};
-				if_id_reg <= '{default:0};
+			if_id_reg <= '{default:0};
+			rd_ram_addr <= '{default:0};
+			jump_was_fetched <= 0;
+		end else if (jump_was_fetched) begin
+			// Inject a NOP if the previous instruction was a jump
+			if_id_reg.pc <= if_id_reg.pc;
+			rd_ram_addr <= pc;
+			if_id_reg.fetched_inst <= rd_ram_data;
+			jump_was_fetched <= 0;
 		end else begin
-				rd_ram_addr <= pc;
-				fetched_inst_r <= rd_ram_data;
-				if_id_reg.pc <= pc;
+			if_id_reg.pc <= rd_ram_addr;
+			rd_ram_addr <= pc;
+			if_id_reg.fetched_inst <= rd_ram_data;
+			jump_was_fetched <= rd_ram_data[6:0] == 7'b1101111;
 		end
 	end
 

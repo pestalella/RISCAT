@@ -5,11 +5,11 @@
 import uvm_pkg::*;
 
 interface register_file_probe_if(
-  input logic clk,
-	input logic [31:0] pc,
-  input logic wr_en,
-  input logic [4:0] wr_addr,
-  input logic [31:0] wr_data);
+	input logic clk,
+	input logic [15:0] pc,
+	input logic wr_en,
+	input logic [4:0] wr_addr,
+	input logic [31:0] wr_data);
 
 	task wait_edge();
 		@(clk iff(wr_en == 1));

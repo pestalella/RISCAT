@@ -5,7 +5,7 @@ class mem_agent extends uvm_agent;
 
 	mem_sequencer m_sequencer;
 	mem_driver    m_driver;
-  mem_monitor   m_monitor;
+	mem_monitor   m_monitor;
 
 	function new(string name, uvm_component parent);
 		super.new(name, parent);

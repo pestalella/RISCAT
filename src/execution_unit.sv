@@ -13,7 +13,7 @@ module exec_unit (
 	output logic reset_n,
 
 	output wire rd_ram_en,
-	output logic [31:0] rd_ram_addr,
+	output logic [15:0] rd_ram_addr,
 	input logic [31:0] rd_ram_data,
 
 	output wire wr_ram_en,
@@ -21,18 +21,21 @@ module exec_unit (
 	input logic [31:0] wr_ram_data
 );
 
-  logic [31:0] pc;
+	logic [15:0] pc;
+	logic jump_was_fetched;
 
-	// always read a new instruction
-	assign rd_ram_en = 1;
+	// Don't read while we inject a bubble
+	assign rd_ram_en = ~jump_was_fetched;
 
 	// Update program counter
 	always_ff @(posedge clk or negedge reset_n) begin
-			if (!reset_n) begin
-					pc  <= 0;
-			end else begin
-					pc  <= pc + 4;
-			end
+		if (!reset_n) begin
+			pc  <= 0;
+		end else if (id_ex_reg.is_jump) begin
+			pc <= id_ex_reg.pc + id_ex_reg.jump_offset;
+		end	else if (!jump_was_fetched) begin
+			pc  <= pc + 4;
+		end
 	end
 
 	IF_ID if_id_reg;
@@ -49,13 +52,13 @@ module exec_unit (
 	logic raw_hazard_rs1;
 	logic raw_hazard_rs2;
 
-
 	fetch_unit instruction_fetch(
 		.clk(clk),
 		.reset_n(reset_n),
 		.pc(pc),
-		.rd_ram_addr(rd_ram_addr),
 		.rd_ram_data(rd_ram_data),
+		.jump_was_fetched(jump_was_fetched),
+		.rd_ram_addr(rd_ram_addr),
 		.if_id_reg(if_id_reg)
 	);
 

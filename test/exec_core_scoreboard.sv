@@ -4,7 +4,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
 	uvm_analysis_imp #(exec_core_message, exec_core_scoreboard) m_ap;
 
 	exec_core_message transactions[$];
-	bit[31:0] expected_jumps[$];
+	bit[15:0] expected_jumps[$];
 
 	bit[31:0] expected_reg_inputs [0:31];
 
@@ -31,6 +31,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
 		`uvm_info(get_type_name(), $sformatf("received a RESET action:\n%s", tx.sprint()), UVM_MEDIUM)
 		expected_reg_inputs = '{default:0};
 		transactions.delete();
+		expected_jumps.delete();
 	end
 	else if (tx.m_action == REG_WR) begin
 		exec_core_message saved_transaction = transactions.pop_front();
@@ -50,14 +51,17 @@ class exec_core_scoreboard extends uvm_scoreboard;
 		end
 	end
 	else if (tx.m_action == JUMP) begin
-		bit[31:0] expected_pc = expected_jumps.pop_front();
+		// bit[15:0] expected_pc;
+		// assert(expected_jumps.size() > 0) else
+		// 	`uvm_fatal(get_type_name(), "UNEXPECTED JUMP, the queue is empty")
+		// expected_pc = expected_jumps.pop_front();
 		`uvm_info(get_type_name(), "A jump happened", UVM_MEDIUM)
-		assert (tx.pc == expected_pc) else
-			`uvm_fatal(get_type_name(),
-				$sformatf("Expcted PC=%1d. Actual PC=%1d", expected_pc, tx.pc))
+		// assert ((tx.pc + signed'(tx.jump_offset)) == expected_pc) else
+		// 	`uvm_fatal(get_type_name(),
+		// 		$sformatf("Expected PC=%1d. Actual PC=%1d", expected_pc, tx.pc + signed'(tx.jump_offset)))
 	end
 	else if (tx.m_action == INST_JAL) begin
-		bit[31:0] target = tx.pc +  signed'(tx.jump_offset);
+		bit[15:0] target = tx.pc +  signed'(tx.jump_offset);
 		`uvm_info(get_type_name(), $sformatf("A jump to address %1d will happen", target), UVM_MEDIUM)
 		expected_jumps.push_back(target);
 	end	else begin

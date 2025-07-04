@@ -38,7 +38,7 @@ import uvm_pkg::*;
 class exec_core_message extends uvm_sequence_item;
 
 	exec_core_action m_action;
-	bit[31:0] pc;
+	bit[15:0] pc;
 	bit[11:0] imm;
 	bit[4:0] rs1;
 	bit[4:0] rs2;

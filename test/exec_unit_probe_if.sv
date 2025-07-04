@@ -7,16 +7,20 @@ import uvm_pkg::*;
 interface exec_unit_probe_if(
 	input logic clk,
 	output logic reset_n,
-	input logic [31:0] pc,
-	input logic [31:0] rd_ram_addr,
-	output logic [31:0] rd_ram_data);
+	input logic [15:0] pc,
+	input logic is_jump,
+	input logic [20:1] jump_offset,
+	input logic [15:0] rd_ram_addr,
+	input logic [31:0] rd_ram_data);
 endinterface
 
 
 bind top.exec_core exec_unit_probe_if exec_unit_probe_inst(
 	.clk(clk),
 	.reset_n(reset_n),
-	.pc(pc),
+	.pc(id_ex_reg.pc),
+	.is_jump(id_ex_reg.is_jump),
+	.jump_offset(id_ex_reg.jump_offset),
 	.rd_ram_addr(rd_ram_addr),
 	.rd_ram_data(rd_ram_data)
 );

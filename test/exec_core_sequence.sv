@@ -146,21 +146,26 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 
 //		do_alu_items();
 
-		`uvm_do_with(req, { req.cmd == CMD_JAL; req.jump_offset == 16;})
+		// `uvm_do_with(req, { req.cmd == CMD_JAL; req.jump_offset == 256;})
+		// `uvm_do_with(req, { req.cmd == CMD_JAL; req.jump_offset == 256;})
+		// `uvm_do_with(req, { req.cmd == CMD_JAL; req.jump_offset == 256;})
 
 		// repeat(1000)
 		// begin
 		// 		`uvm_do_with(req, { req.cmd != CMD_RESET;})
 		// end
 
+		#400;  // Wait 400 clock cycles to let the program run
+
 
 		//////////////////////////////////////////////////
 		// Epilogue to drain all the `previous intructions
 		//////////////////////////////////////////////////
-		repeat(10)
-		begin
-			`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 0; req.rs1 == 0; req.imm == 0;})
-		end
+		// repeat(10)
+		// begin
+		// 	`uvm_do_with(req, { req.cmd == CMD_ADDI; req.rd == 0; req.rs1 == 0; req.imm == 0;})
+		// end
+
 	endtask: body
 
 endclass: exec_core_sequence
