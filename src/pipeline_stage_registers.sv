@@ -6,6 +6,7 @@
 typedef struct packed {
 	logic [15:0] pc;
 	logic [31:0] fetched_inst;
+	logic do_not_execute;
 } IF_ID;
 
 
@@ -26,6 +27,8 @@ typedef struct packed {
 
 	logic [20:1] jump_offset;
 	logic is_jump;
+
+	logic do_not_execute;
 } ID_EX;
 
 
@@ -34,7 +37,9 @@ typedef struct packed {
 	logic reg_wr_en;
 	logic [4:0] reg_wr_addr;
 	logic alu_result_ready;
-  logic [31:0] alu_result;
+	logic [31:0] alu_result;
+
+	logic do_not_execute;
 } EX_WB;
 
 `endif

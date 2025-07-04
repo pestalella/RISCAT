@@ -25,7 +25,8 @@ module exec_unit (
 	logic jump_was_fetched;
 
 	// Don't read while we inject a bubble
-	assign rd_ram_en = ~jump_was_fetched;
+	assign rd_ram_en = 1;
+//	assign rd_ram_en = ~jump_was_fetched;
 
 	// Update program counter
 	always_ff @(posedge clk or negedge reset_n) begin
@@ -51,6 +52,8 @@ module exec_unit (
 
 	logic raw_hazard_rs1;
 	logic raw_hazard_rs2;
+
+	assert property(@(posedge clk) !$isunknown(id_ex_reg));
 
 	fetch_unit instruction_fetch(
 		.clk(clk),

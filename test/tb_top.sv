@@ -68,6 +68,7 @@ module top;
 
 	task init_memory();
 		jal_inst jump_inst;
+		reg_imm_inst inst_reg_imm;
 
 		`uvm_info("tb_top::init_memory", "Initializing program memory", UVM_MEDIUM)
 
@@ -80,6 +81,13 @@ module top;
 		jump_inst.rd = 1;
 
 		instructions.data[0] = jump_inst.encoded();
+
+		inst_reg_imm = new(ADDI);
+		inst_reg_imm.imm = 1234;
+		inst_reg_imm.rs1 = 0;
+		inst_reg_imm.rd = 27;
+		instructions.data[4] = inst_reg_imm.encoded();
+
 		jump_inst.jump_offset = 32;
 		instructions.data[16] = jump_inst.encoded();
 		jump_inst.jump_offset = -40;

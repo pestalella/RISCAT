@@ -24,6 +24,7 @@ module fetch_unit(
 			if_id_reg.pc <= if_id_reg.pc;
 			rd_ram_addr <= pc;
 			if_id_reg.fetched_inst <= rd_ram_data;
+			if_id_reg.do_not_execute <= 1;
 			jump_was_fetched <= 0;
 		end else begin
 			if_id_reg.pc <= rd_ram_addr;

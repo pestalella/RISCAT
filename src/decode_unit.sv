@@ -87,7 +87,8 @@ module decode_unit(
 			id_ex_reg.inst_imm <= is_reg_imm_inst? {{20{if_id_reg.fetched_inst[31]}}, if_id_reg.fetched_inst[31:20]} : 32'b0;
 			id_ex_reg.inst_imm_sgn <= is_reg_imm_inst? {{20{if_id_reg.fetched_inst[31]}}, if_id_reg.fetched_inst[31:20]} : 0;
 			id_ex_reg.shamt <= if_id_reg.fetched_inst[24:20];
-			id_ex_reg.alu_op <= is_addi?  ALU_ADDI : (
+			id_ex_reg.alu_op <= if_id_reg.do_not_execute? ALU_NONE: (
+								is_addi?  ALU_ADDI : (
 								is_slti?  ALU_SLTI : (
 								is_sltiu? ALU_SLTIU : (
 								is_slli?  ALU_SLLI : (
@@ -107,7 +108,7 @@ module decode_unit(
 								is_sra?   ALU_SRA : (
 								is_or?    ALU_OR : (
 								is_and?   ALU_AND : ALU_NONE
-				))))))))))))))))));
+				)))))))))))))))))));
 
 			id_ex_reg.is_jump = is_jal;
 			id_ex_reg.pc <= if_id_reg.pc;
@@ -117,6 +118,7 @@ module decode_unit(
 				if_id_reg.fetched_inst[20],
 				if_id_reg.fetched_inst[30:21]
 			};
+			id_ex_reg.do_not_execute = if_id_reg.do_not_execute;
 		end
 	end
 endmodule

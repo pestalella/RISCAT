@@ -41,6 +41,8 @@ module alu_stage(
 		end else begin
 			ex_wb_reg.alu_result = 'hdeadbeef;
 			ex_wb_reg.alu_result_ready = 0;
+			ex_wb_reg.do_not_execute = id_ex_reg.do_not_execute;
+
 			if (id_ex_reg.alu_op == ALU_NONE) begin
 				ex_wb_reg.alu_result <= '0;
 				ex_wb_reg.alu_result_ready <= 0;
