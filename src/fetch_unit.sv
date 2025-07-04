@@ -13,10 +13,7 @@ module fetch_unit(
 	output IF_ID if_id_reg
 	);
 
-	logic [31:0] fetched_inst_r;
-	assign if_id_reg.fetched_inst = fetched_inst_r;
-
-	always @(posedge clk or negedge reset_n) begin
+	always_ff @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
 				rd_ram_addr <= '{default:0};
 				fetched_inst_r <= '{default:0};

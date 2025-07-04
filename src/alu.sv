@@ -21,7 +21,7 @@ module alu_stage(
 ;
 	logic is_reg_imm_shift;
 	logic [4:0] shift_amount;
-	
+
 	assign is_reg_imm_shift = id_ex_reg.alu_op == ALU_SLLI | id_ex_reg.alu_op == ALU_SRLI | id_ex_reg.alu_op == ALU_SRAI;
     assign shift_amount = is_reg_imm_shift ? id_ex_reg.shamt : alu_reg_input_b[4:0];
 
@@ -33,7 +33,7 @@ module alu_stage(
 		.arithmetic_right_shift(sra_result)
 	);
 
-	always @(posedge clk or negedge reset_n) begin
+	always_ff @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
 			ex_wb_reg <= '{default:0};
 			ex_wb_reg.alu_result <= '0;

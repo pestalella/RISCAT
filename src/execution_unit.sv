@@ -27,7 +27,7 @@ module exec_unit (
 	assign rd_ram_en = 1;
 
 	// Update program counter
-	always @(posedge clk or negedge reset_n) begin
+	always_ff @(posedge clk or negedge reset_n) begin
 			if (!reset_n) begin
 					pc  <= 0;
 			end else begin

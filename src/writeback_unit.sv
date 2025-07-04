@@ -14,7 +14,7 @@ module writeback_unit(
 	output logic [31:0] reg_wr_data
 );
 
-	always @(posedge clk or negedge reset_n) begin
+	always_ff @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
 			reg_wr_en <= 0;
 			reg_wr_addr <= 0;

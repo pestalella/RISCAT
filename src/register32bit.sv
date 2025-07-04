@@ -13,7 +13,7 @@ module register32bit (
     );
 
     logic [31:0] bits;
-    always @(negedge clk)
+    always_ff @(negedge clk)
         if (!reset_n)
             bits <= '0;
         else if (load) begin
