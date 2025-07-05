@@ -23,7 +23,7 @@ endinterface
 
 bind top.exec_core register_file_probe_if register_file_probe_inst(
 	.clk(clk),
-	.pc(ex_wb_reg.pc),
+	.pc(ex_wb_r.pc),
 	.wr_en(registers.wr_en),
 	.wr_addr(registers.wr_addr),
 	.wr_data(registers.wr_data)

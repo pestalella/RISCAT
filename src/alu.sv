@@ -8,11 +8,11 @@ module alu_stage(
 	input logic clk,
 	input logic reset_n,
 
-	input ID_EX id_ex_reg,
+	input ID_EX id_ex_r,
 	input	logic [31:0] alu_reg_input_a,
 	input logic [31:0] alu_reg_input_b,
 
-	output 	EX_WB ex_wb_reg
+	output 	EX_WB ex_wb_r
 );
 
 	logic [31:0] sll_result;
@@ -22,8 +22,8 @@ module alu_stage(
 	logic is_reg_imm_shift;
 	logic [4:0] shift_amount;
 
-	assign is_reg_imm_shift = id_ex_reg.alu_op == ALU_SLLI | id_ex_reg.alu_op == ALU_SRLI | id_ex_reg.alu_op == ALU_SRAI;
-    assign shift_amount = is_reg_imm_shift ? id_ex_reg.shamt : alu_reg_input_b[4:0];
+	assign is_reg_imm_shift = id_ex_r.alu_op == ALU_SLLI | id_ex_r.alu_op == ALU_SRLI | id_ex_r.alu_op == ALU_SRAI;
+    assign shift_amount = is_reg_imm_shift ? id_ex_r.shamt : alu_reg_input_b[4:0];
 
 	shifter shifter_unit(
 		.input_value(alu_reg_input_a),
@@ -35,63 +35,63 @@ module alu_stage(
 
 	always_ff @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
-			ex_wb_reg <= '{default:0};
-			ex_wb_reg.alu_result <= '0;
-			ex_wb_reg.alu_result_ready <= 0;
+			ex_wb_r <= '{default:0};
+			ex_wb_r.alu_result <= '0;
+			ex_wb_r.alu_result_ready <= 0;
 		end else begin
-			ex_wb_reg.alu_result = 'hdeadbeef;
-			ex_wb_reg.alu_result_ready = 0;
-			ex_wb_reg.do_not_execute = id_ex_reg.do_not_execute;
+			ex_wb_r.alu_result = 'hdeadbeef;
+			ex_wb_r.alu_result_ready = 0;
+			ex_wb_r.do_not_execute = id_ex_r.do_not_execute;
 
-			if (id_ex_reg.alu_op == ALU_NONE) begin
-				ex_wb_reg.alu_result <= '0;
-				ex_wb_reg.alu_result_ready <= 0;
+			if (id_ex_r.alu_op == ALU_NONE) begin
+				ex_wb_r.alu_result <= '0;
+				ex_wb_r.alu_result_ready <= 0;
 			end else begin
 				// Reg-imm operations
-				if (id_ex_reg.alu_op == ALU_ADDI) begin
-					ex_wb_reg.alu_result <=  alu_reg_input_a + signed'(id_ex_reg.inst_imm_sgn);
-				end else if (id_ex_reg.alu_op == ALU_SLTI) begin
-					ex_wb_reg.alu_result <= (signed'(alu_reg_input_a) < signed'(id_ex_reg.inst_imm_sgn))? 1 : 0;
-				end else if (id_ex_reg.alu_op == ALU_SLTIU) begin
-					ex_wb_reg.alu_result <= (signed'(alu_reg_input_a) < id_ex_reg.inst_imm_sgn)? 1 : 0;
-				end else if (id_ex_reg.alu_op == ALU_XORI) begin
-					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) ^ id_ex_reg.inst_imm_sgn;
-				end else if (id_ex_reg.alu_op == ALU_ORI) begin
-					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) | id_ex_reg.inst_imm_sgn;
-				end else if (id_ex_reg.alu_op == ALU_ANDI) begin
-					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) & id_ex_reg.inst_imm_sgn;
-				end else if (id_ex_reg.alu_op == ALU_SLLI) begin
-					ex_wb_reg.alu_result <= sll_result;
-				end else if (id_ex_reg.alu_op == ALU_SRLI) begin
-					ex_wb_reg.alu_result <= srl_result;
-				end else if (id_ex_reg.alu_op == ALU_SRAI) begin
-					ex_wb_reg.alu_result <= sra_result;
+				if (id_ex_r.alu_op == ALU_ADDI) begin
+					ex_wb_r.alu_result <=  alu_reg_input_a + signed'(id_ex_r.inst_imm_sgn);
+				end else if (id_ex_r.alu_op == ALU_SLTI) begin
+					ex_wb_r.alu_result <= (signed'(alu_reg_input_a) < signed'(id_ex_r.inst_imm_sgn))? 1 : 0;
+				end else if (id_ex_r.alu_op == ALU_SLTIU) begin
+					ex_wb_r.alu_result <= (signed'(alu_reg_input_a) < id_ex_r.inst_imm_sgn)? 1 : 0;
+				end else if (id_ex_r.alu_op == ALU_XORI) begin
+					ex_wb_r.alu_result <= signed'(alu_reg_input_a) ^ id_ex_r.inst_imm_sgn;
+				end else if (id_ex_r.alu_op == ALU_ORI) begin
+					ex_wb_r.alu_result <= signed'(alu_reg_input_a) | id_ex_r.inst_imm_sgn;
+				end else if (id_ex_r.alu_op == ALU_ANDI) begin
+					ex_wb_r.alu_result <= signed'(alu_reg_input_a) & id_ex_r.inst_imm_sgn;
+				end else if (id_ex_r.alu_op == ALU_SLLI) begin
+					ex_wb_r.alu_result <= sll_result;
+				end else if (id_ex_r.alu_op == ALU_SRLI) begin
+					ex_wb_r.alu_result <= srl_result;
+				end else if (id_ex_r.alu_op == ALU_SRAI) begin
+					ex_wb_r.alu_result <= sra_result;
 
 				// Reg-reg operations
-				end else if (id_ex_reg.alu_op == ALU_ADD) begin
-					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) + signed'(alu_reg_input_b);
-				end else if (id_ex_reg.alu_op == ALU_SUB) begin
-					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) - signed'(alu_reg_input_b);
-				end else if (id_ex_reg.alu_op == ALU_SLT) begin
-					ex_wb_reg.alu_result <= signed'(alu_reg_input_a) < signed'(alu_reg_input_b);
-				end else if (id_ex_reg.alu_op == ALU_SLTU) begin
-					ex_wb_reg.alu_result <= (alu_reg_input_a < alu_reg_input_b)? 1 : 0;
-				end else if (id_ex_reg.alu_op == ALU_XOR) begin
-					ex_wb_reg.alu_result <= alu_reg_input_a ^ alu_reg_input_b;
-				end else if (id_ex_reg.alu_op == ALU_OR) begin
-					ex_wb_reg.alu_result <= alu_reg_input_a | alu_reg_input_b;
-				end else if (id_ex_reg.alu_op == ALU_AND) begin
-					ex_wb_reg.alu_result <= alu_reg_input_a & alu_reg_input_b;
-				end else if (id_ex_reg.alu_op == ALU_SLL) begin
-					ex_wb_reg.alu_result <= sll_result;
-				end else if (id_ex_reg.alu_op == ALU_SRL) begin
-					ex_wb_reg.alu_result <= srl_result;
-				end else if (id_ex_reg.alu_op == ALU_SRA) begin
-					ex_wb_reg.alu_result <= sra_result;
+				end else if (id_ex_r.alu_op == ALU_ADD) begin
+					ex_wb_r.alu_result <= signed'(alu_reg_input_a) + signed'(alu_reg_input_b);
+				end else if (id_ex_r.alu_op == ALU_SUB) begin
+					ex_wb_r.alu_result <= signed'(alu_reg_input_a) - signed'(alu_reg_input_b);
+				end else if (id_ex_r.alu_op == ALU_SLT) begin
+					ex_wb_r.alu_result <= signed'(alu_reg_input_a) < signed'(alu_reg_input_b);
+				end else if (id_ex_r.alu_op == ALU_SLTU) begin
+					ex_wb_r.alu_result <= (alu_reg_input_a < alu_reg_input_b)? 1 : 0;
+				end else if (id_ex_r.alu_op == ALU_XOR) begin
+					ex_wb_r.alu_result <= alu_reg_input_a ^ alu_reg_input_b;
+				end else if (id_ex_r.alu_op == ALU_OR) begin
+					ex_wb_r.alu_result <= alu_reg_input_a | alu_reg_input_b;
+				end else if (id_ex_r.alu_op == ALU_AND) begin
+					ex_wb_r.alu_result <= alu_reg_input_a & alu_reg_input_b;
+				end else if (id_ex_r.alu_op == ALU_SLL) begin
+					ex_wb_r.alu_result <= sll_result;
+				end else if (id_ex_r.alu_op == ALU_SRL) begin
+					ex_wb_r.alu_result <= srl_result;
+				end else if (id_ex_r.alu_op == ALU_SRA) begin
+					ex_wb_r.alu_result <= sra_result;
 				end
-				ex_wb_reg.alu_result_ready <= 1;
-				ex_wb_reg.reg_wr_addr <= id_ex_reg.reg_wr_addr;
-				ex_wb_reg.reg_wr_en <= id_ex_reg.reg_wr_en;
+				ex_wb_r.alu_result_ready <= 1;
+				ex_wb_r.reg_wr_addr <= id_ex_r.reg_wr_addr;
+				ex_wb_r.reg_wr_en <= id_ex_r.reg_wr_en;
 
 			end
 		end

@@ -7,8 +7,8 @@
 module decode_unit(
 	input logic clk,
 	input logic reset_n,
-	input IF_ID if_id_reg,
-	output ID_EX id_ex_reg
+	input IF_ID if_id_r,
+	output ID_EX id_ex_r
 );
 
 	logic is_reg_imm_inst;
@@ -38,10 +38,10 @@ module decode_unit(
 
 	logic is_jal;
 
-	assign is_reg_imm_inst = if_id_reg.fetched_inst[6:0] == 7'b0010011;
-	assign is_reg_reg_inst = if_id_reg.fetched_inst[6:0] == 7'b0110011;
-	assign inst_f3 = if_id_reg.fetched_inst[14:12];
-	assign inst_f7 = if_id_reg.fetched_inst[31:25];
+	assign is_reg_imm_inst = if_id_r.fetched_inst[6:0] == 7'b0010011;
+	assign is_reg_reg_inst = if_id_r.fetched_inst[6:0] == 7'b0110011;
+	assign inst_f3 = if_id_r.fetched_inst[14:12];
+	assign inst_f7 = if_id_r.fetched_inst[31:25];
 
 	assign is_addi  = is_reg_imm_inst && (inst_f3 == 'b000);
 	assign is_slli  = is_reg_imm_inst && (inst_f3 == 'b001);
@@ -64,30 +64,30 @@ module decode_unit(
 	assign is_or   = is_reg_reg_inst && (inst_f7 == 'b0000000) && (inst_f3 == 'b110);
 	assign is_and  = is_reg_reg_inst && (inst_f7 == 'b0000000) && (inst_f3 == 'b111);
 
-	assign is_jal = if_id_reg.fetched_inst[6:0] == 7'b1101111;
+	assign is_jal = if_id_r.fetched_inst[6:0] == 7'b1101111;
 
 	logic [4:0] next_rd0_addr;
 	logic [4:0] next_rd1_addr;
 
 	always_ff @(posedge clk or negedge reset_n) begin
 		if (!reset_n) begin
-			id_ex_reg <= '{default:0};
+			id_ex_r <= '{default:0};
 			next_rd0_addr <= '{default:0};
 			next_rd1_addr <= '{default:0};
 		end else begin
-			next_rd0_addr <= if_id_reg.fetched_inst[19:15];  // All the instructions with rs1 get the address from those bits
-			next_rd1_addr <= is_reg_reg_inst? if_id_reg.fetched_inst[24:20] : 0;
+			next_rd0_addr <= if_id_r.fetched_inst[19:15];  // All the instructions with rs1 get the address from those bits
+			next_rd1_addr <= is_reg_reg_inst? if_id_r.fetched_inst[24:20] : 0;
 
-			id_ex_reg.reg_rs1_addr <= if_id_reg.fetched_inst[19:15];
-			id_ex_reg.reg_rs2_addr <= is_reg_reg_inst? if_id_reg.fetched_inst[24:20] : 0;
-			id_ex_reg.reg_wr_addr <= if_id_reg.fetched_inst[11:7];
-			id_ex_reg.reg_rs1_en <= is_reg_imm_inst | is_reg_reg_inst;
-			id_ex_reg.reg_rs2_en <= is_reg_reg_inst;
-			id_ex_reg.reg_wr_en <= is_reg_imm_inst | is_reg_reg_inst;
-			id_ex_reg.inst_imm <= is_reg_imm_inst? {{20{if_id_reg.fetched_inst[31]}}, if_id_reg.fetched_inst[31:20]} : 32'b0;
-			id_ex_reg.inst_imm_sgn <= is_reg_imm_inst? {{20{if_id_reg.fetched_inst[31]}}, if_id_reg.fetched_inst[31:20]} : 0;
-			id_ex_reg.shamt <= if_id_reg.fetched_inst[24:20];
-			id_ex_reg.alu_op <= if_id_reg.do_not_execute? ALU_NONE: (
+			id_ex_r.reg_rs1_addr <= if_id_r.fetched_inst[19:15];
+			id_ex_r.reg_rs2_addr <= is_reg_reg_inst? if_id_r.fetched_inst[24:20] : 0;
+			id_ex_r.reg_wr_addr <= if_id_r.fetched_inst[11:7];
+			id_ex_r.reg_rs1_en <= is_reg_imm_inst | is_reg_reg_inst;
+			id_ex_r.reg_rs2_en <= is_reg_reg_inst;
+			id_ex_r.reg_wr_en <= is_reg_imm_inst | is_reg_reg_inst;
+			id_ex_r.inst_imm <= is_reg_imm_inst? {{20{if_id_r.fetched_inst[31]}}, if_id_r.fetched_inst[31:20]} : 32'b0;
+			id_ex_r.inst_imm_sgn <= is_reg_imm_inst? {{20{if_id_r.fetched_inst[31]}}, if_id_r.fetched_inst[31:20]} : 0;
+			id_ex_r.shamt <= if_id_r.fetched_inst[24:20];
+			id_ex_r.alu_op <= if_id_r.do_not_execute? ALU_NONE: (
 								is_addi?  ALU_ADDI : (
 								is_slti?  ALU_SLTI : (
 								is_sltiu? ALU_SLTIU : (
@@ -110,15 +110,15 @@ module decode_unit(
 								is_and?   ALU_AND : ALU_NONE
 				)))))))))))))))))));
 
-			id_ex_reg.is_jump = is_jal;
-			id_ex_reg.pc <= if_id_reg.pc;
-			id_ex_reg.jump_offset <= {
-				if_id_reg.fetched_inst[31],
-				if_id_reg.fetched_inst[19:12],
-				if_id_reg.fetched_inst[20],
-				if_id_reg.fetched_inst[30:21]
+			id_ex_r.is_jump = is_jal;
+			id_ex_r.pc <= if_id_r.pc;
+			id_ex_r.jump_offset <= {
+				if_id_r.fetched_inst[31],
+				if_id_r.fetched_inst[19:12],
+				if_id_r.fetched_inst[20],
+				if_id_r.fetched_inst[30:21]
 			};
-			id_ex_reg.do_not_execute = if_id_reg.do_not_execute;
+			id_ex_r.do_not_execute = if_id_r.do_not_execute;
 		end
 	end
 endmodule

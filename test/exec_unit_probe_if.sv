@@ -18,9 +18,9 @@ endinterface
 bind top.exec_core exec_unit_probe_if exec_unit_probe_inst(
 	.clk(clk),
 	.reset_n(reset_n),
-	.pc(id_ex_reg.pc),
-	.is_jump(id_ex_reg.is_jump),
-	.jump_offset(id_ex_reg.jump_offset),
+	.pc(id_ex_r.pc),
+	.is_jump(id_ex_r.is_jump),
+	.jump_offset(id_ex_r.jump_offset),
 	.rd_ram_addr(rd_ram_addr),
 	.rd_ram_data(rd_ram_data)
 );
