@@ -78,12 +78,12 @@ module decode_unit(
 			next_rd0_addr <= if_id_r.fetched_inst[19:15];  // All the instructions with rs1 get the address from those bits
 			next_rd1_addr <= is_reg_reg_inst? if_id_r.fetched_inst[24:20] : 0;
 
-			id_ex_r.reg_rs1_addr <= if_id_r.fetched_inst[19:15];
-			id_ex_r.reg_rs2_addr <= is_reg_reg_inst? if_id_r.fetched_inst[24:20] : 0;
+			id_ex_r.rs1_addr <= if_id_r.fetched_inst[19:15];
+			id_ex_r.rs2_addr <= is_reg_reg_inst? if_id_r.fetched_inst[24:20] : 0;
 			id_ex_r.reg_wr_addr <= if_id_r.fetched_inst[11:7];
-			id_ex_r.reg_rs1_en <= is_reg_imm_inst | is_reg_reg_inst;
-			id_ex_r.reg_rs2_en <= is_reg_reg_inst;
-			id_ex_r.reg_wr_en <= is_reg_imm_inst | is_reg_reg_inst;
+			id_ex_r.rs1_rd_en <= is_reg_imm_inst | is_reg_reg_inst;
+			id_ex_r.rs2_rd_en <= is_reg_reg_inst;
+			id_ex_r.rd_wr_en <= is_reg_imm_inst | is_reg_reg_inst;
 			id_ex_r.inst_imm <= is_reg_imm_inst? {{20{if_id_r.fetched_inst[31]}}, if_id_r.fetched_inst[31:20]} : 32'b0;
 			id_ex_r.inst_imm_sgn <= is_reg_imm_inst? {{20{if_id_r.fetched_inst[31]}}, if_id_r.fetched_inst[31:20]} : 0;
 			id_ex_r.shamt <= if_id_r.fetched_inst[24:20];

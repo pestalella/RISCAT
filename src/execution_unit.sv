@@ -78,11 +78,11 @@ module exec_unit (
 	register32bit_file registers(
 		.clk(clk),
 		.reset_n(reset_n),
-		.rd0_en(id_ex_r.reg_rs1_en),
-		.rd0_addr(id_ex_r.reg_rs1_addr),
+		.rd0_en(id_ex_r.rs1_rd_en),
+		.rd0_addr(id_ex_r.rs1_addr),
 		.rd0_data(regfile_rs1),
-		.rd1_en(id_ex_r.reg_rs2_en),
-		.rd1_addr(id_ex_r.reg_rs2_addr),
+		.rd1_en(id_ex_r.rs2_rd_en),
+		.rd1_addr(id_ex_r.rs2_addr),
 		.rd1_data(regfile_rs2),
 		.wr_en(wb_wr_en),
 		.wr_addr(wb_wr_addr),
@@ -111,7 +111,7 @@ module exec_unit (
 		.alu_result(ex_wb_r.alu_result),
 		.wr_addr(ex_wb_r.reg_wr_addr),
 
-		.reg_wr_en(wb_wr_en),
+		.rd_wr_en(wb_wr_en),
 		.reg_wr_addr(wb_wr_addr),
 		.reg_wr_data(wb_wr_data)
 	);

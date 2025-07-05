@@ -91,7 +91,7 @@ module alu_stage(
 				end
 				ex_wb_r.alu_result_ready <= 1;
 				ex_wb_r.reg_wr_addr <= id_ex_r.reg_wr_addr;
-				ex_wb_r.reg_wr_en <= id_ex_r.reg_wr_en;
+				ex_wb_r.rd_wr_en <= id_ex_r.rd_wr_en;
 
 			end
 		end
