@@ -76,22 +76,43 @@ module top;
 			instructions.data[i] = '{default:0};
 		end
 
-		jump_inst = new(JAL);
-		jump_inst.jump_offset = 16;
-		jump_inst.rd = 1;
-
-		instructions.data[0] = jump_inst.encoded();
+		// [00] 		addi r27, r0, 1234
+		// [04] 		jal r1, label1
+		// [08] 		addi r15, r0, 777
+		// [12] 			addi r0, r0, 0
+		// [16] label3: addi r0, r0, 0
+		// [20] label1: jal r1, label2
+		// [24] 			addi r0, r0, 0
+		// [28] 			addi r0, r0, 0
+		// [32] 			addi r0, r0, 0
+		// [36] 			addi r0, r0, 0
+		// [40] 			addi r0, r0, 0
+		// [44] 			addi r0, r0, 0
+		// [48] 			addi r0, r0, 0
+		// [52] label2: jal r1, label3(-36)
 
 		inst_reg_imm = new(ADDI);
 		inst_reg_imm.imm = 1234;
 		inst_reg_imm.rs1 = 0;
 		inst_reg_imm.rd = 27;
-		instructions.data[4] = inst_reg_imm.encoded();
+		instructions.data[0] = inst_reg_imm.encoded();
+
+		jump_inst = new(JAL);
+		jump_inst.jump_offset = 16;
+		jump_inst.rd = 1;
+
+		instructions.data[4] = jump_inst.encoded();
+
+		inst_reg_imm = new(ADDI);
+		inst_reg_imm.imm = 777;
+		inst_reg_imm.rs1 = 0;
+		inst_reg_imm.rd = 15;
+		instructions.data[8] = inst_reg_imm.encoded();
 
 		jump_inst.jump_offset = 32;
-		instructions.data[16] = jump_inst.encoded();
-		jump_inst.jump_offset = -40;
-		instructions.data[48] = jump_inst.encoded();
+		instructions.data[20] = jump_inst.encoded();
+		jump_inst.jump_offset = -36;
+		instructions.data[52] = jump_inst.encoded();
 	endtask
 
 endmodule: top

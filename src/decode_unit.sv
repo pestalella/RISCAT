@@ -66,24 +66,16 @@ module decode_unit(
 
 	assign is_jal = if_id_r.fetched_inst[6:0] == 7'b1101111;
 
-	logic [4:0] next_rd0_addr;
-	logic [4:0] next_rd1_addr;
-
 	always_ff @(posedge clk or negedge reset_n) begin
-		if (!reset_n) begin
+		if (~reset_n) begin
 			id_ex_r <= '{default:0};
-			next_rd0_addr <= '{default:0};
-			next_rd1_addr <= '{default:0};
 		end else begin
-			next_rd0_addr <= if_id_r.fetched_inst[19:15];  // All the instructions with rs1 get the address from those bits
-			next_rd1_addr <= is_reg_reg_inst? if_id_r.fetched_inst[24:20] : 0;
-
 			id_ex_r.rs1_addr <= if_id_r.fetched_inst[19:15];
 			id_ex_r.rs2_addr <= is_reg_reg_inst? if_id_r.fetched_inst[24:20] : 0;
 			id_ex_r.reg_wr_addr <= if_id_r.fetched_inst[11:7];
-			id_ex_r.rs1_rd_en <= is_reg_imm_inst | is_reg_reg_inst;
+			id_ex_r.rs1_rd_en <= is_reg_imm_inst || is_reg_reg_inst;
 			id_ex_r.rs2_rd_en <= is_reg_reg_inst;
-			id_ex_r.rd_wr_en <= is_reg_imm_inst | is_reg_reg_inst;
+			id_ex_r.rd_wr_en <= (is_reg_imm_inst || is_reg_reg_inst) && if_id_r.fetched_inst[11:7] != 0;
 			id_ex_r.inst_imm <= is_reg_imm_inst? {{20{if_id_r.fetched_inst[31]}}, if_id_r.fetched_inst[31:20]} : 32'b0;
 			id_ex_r.inst_imm_sgn <= is_reg_imm_inst? {{20{if_id_r.fetched_inst[31]}}, if_id_r.fetched_inst[31:20]} : 0;
 			id_ex_r.shamt <= if_id_r.fetched_inst[24:20];

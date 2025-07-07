@@ -14,7 +14,7 @@ module register32bit (
 
     logic [31:0] bits;
     always_ff @(negedge clk)
-        if (!reset_n)
+        if (~reset_n)
             bits <= '0;
         else if (load) begin
             assert (^data_in !== 1'bX)

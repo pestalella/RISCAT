@@ -6,7 +6,7 @@
 	if (req.cmd == CMD_``inst_name) 				  \
 	begin										 	  \
 		``result = new(``inst_name);			 		  \
-		action_received.m_action = INST_``inst_name;  \
+		action_received.action = INST_``inst_name;  \
 	end else
 
 class exec_core_driver extends uvm_driver #(exec_core_transaction);
@@ -54,7 +54,7 @@ class exec_core_driver extends uvm_driver #(exec_core_transaction);
 
 				`uvm_info(get_type_name(), $sformatf("[%04h]: %s", vif.rd_ram_addr, jump_inst.sprint()), UVM_MEDIUM)
 
-				action_received.m_action = INST_JAL;
+				action_received.action = INST_JAL;
 				action_received.rd = req.rd;
 				action_received.jump_offset = req.jump_offset;
 				m_ap.write(action_received);

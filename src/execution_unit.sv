@@ -24,15 +24,15 @@ module exec_unit (
 	logic [15:0] pc;
 	logic jump_was_fetched;
 
-	assign rd_ram_en = 1;
+	assign rd_ram_en = reset_n;
 
 	// Update program counter
 	always_ff @(posedge clk or negedge reset_n) begin
-		if (!reset_n) begin
+		if (~reset_n) begin
 			pc  <= 0;
 		end else if (id_ex_r.is_jump) begin
 			pc <= id_ex_r.pc + id_ex_r.jump_offset;
-		end	else if (!jump_was_fetched) begin
+		end	else begin
 			pc  <= pc + 4;
 		end
 	end
@@ -41,9 +41,9 @@ module exec_unit (
 	ID_EX id_ex_r;
 	EX_WB ex_wb_r;
 
-	logic wb_wr_en;
-	logic [4:0] wb_wr_addr;
-	logic [31:0] wb_wr_data;
+	wire wb_wr_en;
+	wire [4:0] wb_wr_addr;
+	wire [31:0] wb_wr_data;
 
 	logic [31:0] regfile_rs1;
 	logic [31:0] regfile_rs2;

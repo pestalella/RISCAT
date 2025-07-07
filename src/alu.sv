@@ -34,7 +34,7 @@ module alu_stage(
 	);
 
 	always_ff @(posedge clk or negedge reset_n) begin
-		if (!reset_n) begin
+		if (~reset_n) begin
 			ex_wb_r <= '{default:0};
 			ex_wb_r.alu_result <= '0;
 			ex_wb_r.alu_result_ready <= 0;

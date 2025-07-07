@@ -15,15 +15,19 @@ module writeback_unit(
 );
 
 	always_ff @(posedge clk or negedge reset_n) begin
-		if (!reset_n) begin
+		if (~reset_n) begin
 			rd_wr_en <= 0;
-			reg_wr_addr <= 0;
-			reg_wr_data <= 0;
+			reg_wr_addr <= '{default:0};
+			reg_wr_data <= '{default:0};
 		end else begin
 			if (result_ready) begin
 				rd_wr_en <= 1;
 				reg_wr_addr <= wr_addr;
 				reg_wr_data <= alu_result;
+			end else begin
+				rd_wr_en <= 0;
+				reg_wr_addr <= '{default:0};
+				reg_wr_data <= '{default:0};
 			end
 		end
 	end
