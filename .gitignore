@@ -101,3 +101,7 @@ RISCAT.hw
 RISCAT.ip_user_files
 RISCAT.runs
 .Xil/
+RISCAT.srcs/constrs_1/new/global_timing.xdc
+RISCAT.srcs/utils_1/imports/synth_1/exec_unit.dcp
+xsim.dir/top_behav/Compile_Options.txt
+xsim.dir/top_behav/TempBreakPointFile.txt
