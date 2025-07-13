@@ -17,9 +17,26 @@ class random_inst_generator;
 
 	constraint few_jumps {
 		instr dist {
-			ADDI,	SLTI,	SLTIU,	XORI,	ORI,	ANDI,	SLLI,	SRLI,	SRAI := 100,
-			ADD,	SUB,	SLL,	SLT,	SLTU,	XOR,	SRL,	SRA,	OR,	AND := 100,
-			JAL := 10
+			ADDI	:= 100,
+			SLTI 	:= 100,
+			SLTIU := 100,
+			XORI	:= 100,
+			ORI		:= 100,
+			ANDI 	:= 100,
+			SLLI 	:= 100,
+			SRLI 	:= 100,
+			SRAI 	:= 100,
+			ADD 	:= 100,
+			SUB 	:= 100,
+			SLL 	:= 100,
+			SLT		:= 100,
+			SLTU 	:= 100,
+			XOR 	:= 100,
+			SRL 	:= 100,
+			SRA 	:= 100,
+			OR 		:= 100,
+			AND 	:= 100,
+			JAL 	:= 1
 		};
 	}
 

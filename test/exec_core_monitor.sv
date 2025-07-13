@@ -42,7 +42,7 @@ class exec_core_monitor extends uvm_monitor;
 					tx.action  = JUMP;
 					tx.pc = execunit_vif.pc;
 					tx.rd = execunit_vif.id_ex_r.reg_wr_addr;
-					tx.reg_wr_data = execunit_vif.pc + 4;
+					tx.reg_wr_data = execunit_vif.id_ex_r.jump_return_addr;
 					tx.jump_offset = execunit_vif.jump_offset;
 					m_ap.write(tx);
 				end
@@ -64,11 +64,11 @@ class exec_core_monitor extends uvm_monitor;
 
 				if (!execunit_vif.id_ex_r.do_not_execute) begin
 					// Some instruction. If it's an ALU instruction, report it
-					if (execunit_vif.id_ex_r.alu_op != ALU_NONE)
+					if (execunit_vif.id_ex_r.alu_op != ALU_NONE && !execunit_vif.is_jump)
 					begin
 						`uvm_info(get_type_name(), $sformatf("Detected an ALU instruction: %s",
 							execunit_vif.id_ex_r.alu_op.name()), UVM_MEDIUM)
-							
+
 						tx = exec_core_message::type_id::create("tx", this);
 						tx.action = aluop_to_action(execunit_vif.id_ex_r.alu_op);
 						tx.pc = execunit_vif.id_ex_r.pc;

@@ -48,7 +48,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
 							$sformatf("received a write to r%1d, was expecting a write to r%1d", tx.rd, saved_transaction.rd))
 					assert (signed'(tx.reg_wr_data) == signed'(saved_transaction.reg_wr_data))
 					else
-						`uvm_error(get_type_name(),
+						`uvm_fatal(get_type_name(),
 							$sformatf("received a write to r%1d, expected value was %1d, received %1d instead.\nReceived transaction:\n%sSaved transaction:\n%s",
 								tx.rd, signed'(saved_transaction.reg_wr_data), signed'(tx.reg_wr_data), tx.sprint(), saved_transaction.sprint()))
 				end
@@ -56,12 +56,14 @@ class exec_core_scoreboard extends uvm_scoreboard;
 				instruction_count = instruction_count + 1;
 				if (tx.action == JUMP) begin
 					bit[15:0] target = tx.pc +  signed'(tx.jump_offset);
-					`uvm_info(get_type_name(), $sformatf("A jump to address %1d will happen soon", target), UVM_MEDIUM)
+					`uvm_info(get_type_name(), $sformatf("A jump to address %1d will happen soon. Return address is %1d", target, tx.reg_wr_data), UVM_MEDIUM)
 					// expected_jumps.push_back(target);
 					if (tx.rd != 0) begin
 							expected_reg_inputs[tx.rd] = tx.reg_wr_data;
-							`uvm_info(get_type_name(), $sformatf("r%1d =%1d",	tx.rd, signed'(expected_reg_inputs[tx.rd])), UVM_MEDIUM)
 					end
+				end	else if (tx.action == INST_JAL) begin
+					bit[15:0] target = tx.pc +  signed'(tx.jump_offset);
+					`uvm_info(get_type_name(), $sformatf("jal r%0d, %1d", tx.rd, target), UVM_MEDIUM)
 				end	else if (tx.action == INST_ADDI) begin
 					tx.reg_wr_data = signed'(expected_reg_inputs[tx.rs1]) + signed'({{20{tx.imm[11]}}, tx.imm[11:0]});
 					if (tx.rd != 0) begin
@@ -220,7 +222,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
 				end
 				if (tx.rd != 0) begin
 						expected_reg_inputs[tx.rd] = tx.reg_wr_data;
-						`uvm_info(get_type_name(), $sformatf("r%1d =%1b",	tx.rd, signed'(expected_reg_inputs[tx.rd])), UVM_MEDIUM)
+						`uvm_info(get_type_name(), $sformatf("r%1d =%1d",	tx.rd, signed'(expected_reg_inputs[tx.rd])), UVM_MEDIUM)
 				end
 				`uvm_info(get_type_name, $sformatf("Saving transaction:\n%s", tx.sprint()), UVM_MEDIUM)
 				transactions.push_back(tx);  // saved for later check
