@@ -26,6 +26,7 @@ typedef struct packed {
 	alu_command_t alu_op;
 
 	logic [20:1] jump_offset;
+	logic [31:0] jump_return_addr;
 	logic is_jump;
 
 	logic do_not_execute;

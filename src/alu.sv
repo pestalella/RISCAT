@@ -44,7 +44,7 @@ module alu_stage(
 			ex_wb_r.do_not_execute = id_ex_r.do_not_execute;
 
 			if (id_ex_r.alu_op == ALU_NONE) begin
-				ex_wb_r.alu_result <= '0;
+				ex_wb_r.alu_result <= 'hdeadbeef;
 				ex_wb_r.alu_result_ready <= 0;
 			end else begin
 				// Reg-imm operations
@@ -88,7 +88,12 @@ module alu_stage(
 					ex_wb_r.alu_result <= srl_result;
 				end else if (id_ex_r.alu_op == ALU_SRA) begin
 					ex_wb_r.alu_result <= sra_result;
+
+				// JUMPS
+				end else if (id_ex_r.alu_op == ALU_JAL) begin
+					ex_wb_r.alu_result <= id_ex_r.pc;
 				end
+				
 				ex_wb_r.alu_result_ready <= 1;
 				ex_wb_r.reg_wr_addr <= id_ex_r.reg_wr_addr;
 				ex_wb_r.rd_wr_en <= id_ex_r.rd_wr_en;

@@ -31,7 +31,7 @@ module exec_unit (
 		if (~reset_n) begin
 			pc  <= 0;
 		end else if (id_ex_r.is_jump) begin
-			pc <= id_ex_r.pc + id_ex_r.jump_offset;
+			pc <= id_ex_r.pc + {id_ex_r.jump_offset, 1'b0};
 		end	else begin
 			pc  <= pc + 4;
 		end

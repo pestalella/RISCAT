@@ -21,7 +21,8 @@ typedef enum {
 	ALU_SRL,
 	ALU_SRA,
 	ALU_OR,
-	ALU_AND
+	ALU_AND,
+	ALU_JAL
 } alu_command_t;
 
 `endif

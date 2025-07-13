@@ -155,7 +155,7 @@ class exec_core_sequence extends uvm_sequence #(exec_core_transaction);
 		// 		`uvm_do_with(req, { req.cmd != CMD_RESET;})
 		// end
 
-		#400;  // Wait 400 clock cycles to let the program run
+		#1000;  // Wait 400 clock cycles to let the program run
 
 
 		//////////////////////////////////////////////////

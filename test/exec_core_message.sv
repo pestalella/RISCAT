@@ -55,12 +55,12 @@ class exec_core_message extends uvm_sequence_item;
 		`uvm_field_enum(exec_core_action, action, UVM_DEFAULT)
 		`uvm_field_int(pc, UVM_DEFAULT|UVM_HEX)
 		`uvm_field_int(imm, UVM_DEFAULT|UVM_HEX)
-		`uvm_field_int(rs1, UVM_DEFAULT)
-		`uvm_field_int(rs2, UVM_DEFAULT)
-		`uvm_field_int(rd, UVM_DEFAULT)
-		`uvm_field_int(shamt, UVM_DEFAULT)
-		`uvm_field_int(reg_wr_data, UVM_DEFAULT|UVM_HEX)
-		`uvm_field_int(jump_offset, UVM_DEFAULT)
+		`uvm_field_int(rs1, UVM_DEFAULT|UVM_DEC)
+		`uvm_field_int(rs2, UVM_DEFAULT|UVM_DEC)
+		`uvm_field_int(rd, UVM_DEFAULT|UVM_DEC)
+		`uvm_field_int(shamt, UVM_DEFAULT|UVM_DEC)
+		`uvm_field_int(reg_wr_data, UVM_DEFAULT|UVM_DEC)
+		`uvm_field_int(jump_offset, UVM_DEFAULT|UVM_DEC)
 	`uvm_object_utils_end
 
 endclass: exec_core_message

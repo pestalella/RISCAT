@@ -33,39 +33,52 @@ class exec_core_monitor extends uvm_monitor;
 				tx = exec_core_message::type_id::create("tx", this);
 				tx.action  = RESET;
 				m_ap.write(tx);
-			end else if (execunit_vif.is_jump) begin
-				`uvm_info(get_type_name(), $sformatf("Detected a jump from PC=%1d to PC=%1d",
-					execunit_vif.pc, execunit_vif.pc + signed'(execunit_vif.jump_offset)), UVM_MEDIUM);
-				tx = exec_core_message::type_id::create("tx", this);
-				tx.action  = JUMP;
-				tx.pc = execunit_vif.pc;
-				tx.jump_offset = execunit_vif.jump_offset;
-				m_ap.write(tx);
-			end else if (regfile_vif.wr_en) begin
-				`uvm_info(get_type_name(),
-					$sformatf("Detected a register file write. r%1d = %1d",
-						regfile_vif.wr_addr, signed'(regfile_vif.wr_data)),
-					UVM_MEDIUM);
-				tx = exec_core_message::type_id::create("tx", this);
-				tx.action  = REG_WR;
-				tx.pc = regfile_vif.pc;
-				tx.rd = regfile_vif.wr_addr;
-				tx.reg_wr_data = regfile_vif.wr_data;
-				m_ap.write(tx);
-			end else if (!execunit_vif.id_ex_r.do_not_execute) begin
-				tx = exec_core_message::type_id::create("tx", this);
-				// Some instruction. If it's an ALU instruction, report it
-				if (execunit_vif.id_ex_r.alu_op != ALU_NONE)
-				begin
-					`uvm_info(get_type_name(), "Detected an ALU instruction. Reporting it.", UVM_MEDIUM)
-					tx.action = aluop_to_action(execunit_vif.id_ex_r.alu_op);
-					tx.pc = execunit_vif.id_ex_r.pc;
-					tx.imm = execunit_vif.id_ex_r.inst_imm;
-					tx.rs1 = execunit_vif.id_ex_r.rs1_addr;
-					tx.rs2 = execunit_vif.id_ex_r.rs2_addr;
+			end else begin
+				if (execunit_vif.is_jump) begin
+					`uvm_info(get_type_name(), $sformatf("Detected a jump from PC=%1d to PC=%1d",
+						execunit_vif.pc, execunit_vif.pc + signed'(execunit_vif.jump_offset)), UVM_MEDIUM);
+
+					tx = exec_core_message::type_id::create("tx", this);
+					tx.action  = JUMP;
+					tx.pc = execunit_vif.pc;
 					tx.rd = execunit_vif.id_ex_r.reg_wr_addr;
-					tx.shamt = execunit_vif.id_ex_r.shamt;
+					tx.reg_wr_data = execunit_vif.pc + 4;
+					tx.jump_offset = execunit_vif.jump_offset;
 					m_ap.write(tx);
+				end
+
+				if (regfile_vif.wr_en) begin
+					`uvm_info(
+						get_type_name(),
+						$sformatf("Detected a register file write. r%1d = %1d",	regfile_vif.wr_addr, signed'(regfile_vif.wr_data)),
+						UVM_MEDIUM
+					);
+
+					tx = exec_core_message::type_id::create("tx", this);
+					tx.action  = REG_WR;
+					tx.pc = regfile_vif.pc;
+					tx.rd = regfile_vif.wr_addr;
+					tx.reg_wr_data = regfile_vif.wr_data;
+					m_ap.write(tx);
+				end
+
+				if (!execunit_vif.id_ex_r.do_not_execute) begin
+					// Some instruction. If it's an ALU instruction, report it
+					if (execunit_vif.id_ex_r.alu_op != ALU_NONE)
+					begin
+						`uvm_info(get_type_name(), $sformatf("Detected an ALU instruction: %s",
+							execunit_vif.id_ex_r.alu_op.name()), UVM_MEDIUM)
+							
+						tx = exec_core_message::type_id::create("tx", this);
+						tx.action = aluop_to_action(execunit_vif.id_ex_r.alu_op);
+						tx.pc = execunit_vif.id_ex_r.pc;
+						tx.imm = execunit_vif.id_ex_r.inst_imm;
+						tx.rs1 = execunit_vif.id_ex_r.rs1_addr;
+						tx.rs2 = execunit_vif.id_ex_r.rs2_addr;
+						tx.rd = execunit_vif.id_ex_r.reg_wr_addr;
+						tx.shamt = execunit_vif.id_ex_r.shamt;
+						m_ap.write(tx);
+					end
 				end
 			end
 		end
@@ -91,6 +104,7 @@ class exec_core_monitor extends uvm_monitor;
 		if (alu_op == ALU_SRA) return INST_SRA;
 		if (alu_op == ALU_OR) return INST_OR;
 		if (alu_op == ALU_AND) return INST_AND;
+		if (alu_op == ALU_JAL) return INST_JAL;
 		`uvm_fatal(get_type_name(), "unknown ALU OP. Can't generate  an action")
 	endfunction
 

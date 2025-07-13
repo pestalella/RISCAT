@@ -131,16 +131,20 @@ endclass
 class jal_inst extends riscv_instruction;
 	rand bit[20:1] jump_offset;
 	rand bit[4:0] rd;
+
+	constraint sane_jumps { jump_offset[1] == 0; }
+	constraint short_jumps { jump_offset < 64; }
+
 	function new(instruction inst);
 		super.new(inst);
 		opcode = 7'b1101111;
 	endfunction
-
 	function string sprint();
 		return $sformatf("JAL r%1d, %1d", rd, signed'(jump_offset));
 	endfunction
 
 	function bit[31:0] encoded();
+		$display("JAL x%0d, %0d", rd, jump_offset);
 		return {>>{{jump_offset[20], jump_offset[10:1], jump_offset[11], jump_offset[19:12]}, rd, opcode}};
 	endfunction
 endclass
