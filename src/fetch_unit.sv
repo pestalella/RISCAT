@@ -29,6 +29,7 @@ module fetch_unit(
 			if_id_r.pc <= rd_ram_addr;
 			if_id_r.fetched_inst <= rd_ram_data;
 			jump_was_fetched <= rd_ram_data[6:0] == 7'b1101111;
+			if_id_r.do_not_execute <= 0;
 		end
 	end
 
