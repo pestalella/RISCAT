@@ -48,7 +48,7 @@ module decode_unit(
 	assign is_slti  = is_reg_imm_inst && (inst_f3 == 'b010);
 	assign is_sltiu = is_reg_imm_inst && (inst_f3 == 'b011);
 	assign is_xori  = is_reg_imm_inst && (inst_f3 == 'b100);
-	assign is_srli =  is_reg_imm_inst && (inst_f3 == 'b101);
+	assign is_srli =  is_reg_imm_inst && (inst_f7 == 'b0000000) && (inst_f3 == 'b101);
 	assign is_srai =  is_reg_imm_inst && (inst_f7 == 'b0100000) && (inst_f3 == 'b101);
 	assign is_ori   = is_reg_imm_inst && (inst_f3 == 'b110);
 	assign is_andi  = is_reg_imm_inst && (inst_f3 == 'b111);
