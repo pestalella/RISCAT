@@ -4,7 +4,7 @@
 `include "alu_enums.svh"
 `include "pipeline_stage_registers.sv"
 
-module alu_stage(
+module arithmetic_logic_unit(
 	input logic clk,
 	input logic reset_n,
 
@@ -36,15 +36,15 @@ module alu_stage(
 	always_ff @(posedge clk or negedge reset_n) begin
 		if (~reset_n) begin
 			ex_wb_r <= '{default:0};
-			ex_wb_r.alu_result <= '0;
+			ex_wb_r.alu_result <= 'X;
 			ex_wb_r.alu_result_ready <= 0;
 		end else begin
-			ex_wb_r.alu_result = 'hdeadbeef;
+			ex_wb_r.alu_result = 'X;
 			ex_wb_r.alu_result_ready = 0;
 			ex_wb_r.do_not_execute = id_ex_r.do_not_execute;
 
 			if (id_ex_r.alu_op == ALU_NONE) begin
-				ex_wb_r.alu_result <= 'hdeadbeef;
+				ex_wb_r.alu_result <= 'X;
 				ex_wb_r.alu_result_ready <= 0;
 			end else begin
 				// Reg-imm operations

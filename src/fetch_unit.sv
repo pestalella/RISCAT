@@ -30,6 +30,9 @@ module fetch_unit(
 			if_id_r.fetched_inst <= rd_ram_data;
 			jump_was_fetched <= rd_ram_data[6:0] == 7'b1101111;
 			if_id_r.do_not_execute <= 0;
+			if_id_r.rs1 <= rd_ram_data[19:15];
+			if_id_r.rs2 <= rd_ram_data[24:20];
+			if_id_r.rd <= rd_ram_data[11:7];
 		end
 	end
 

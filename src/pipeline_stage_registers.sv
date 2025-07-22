@@ -7,6 +7,9 @@ typedef struct packed {
 	logic [15:0] pc;
 	logic [31:0] fetched_inst;
 	logic do_not_execute;
+	logic [4:0] rs1;
+	logic [4:0] rs2;
+	logic [4:0] rd;
 } IF_ID;
 
 

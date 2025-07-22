@@ -52,8 +52,11 @@ module exec_unit (
 	logic raw_hazard_rs2;
 
 	assert property(@(posedge clk) !$isunknown(id_ex_r));
+	assert property(@(posedge clk) (pc[1:0] == 2'b0)) else begin
+				`uvm_fatal("Exec Unit", $sformatf("Misaligned PC: %04h", pc))
+	end
 
-	fetch_unit instruction_fetch(
+	fetch_unit fetch_stage(
 		.clk(clk),
 		.reset_n(reset_n),
 		.pc(pc),
@@ -64,11 +67,11 @@ module exec_unit (
 	);
 
 	always_ff @(posedge clk) begin
-		raw_hazard_rs1 <= ((if_id_r.fetched_inst[11:7] != 0) && (id_ex_r.reg_wr_addr != 0) && (id_ex_r.reg_wr_addr == if_id_r.fetched_inst[19:15]));
-		raw_hazard_rs2 <= ((if_id_r.fetched_inst[11:7] != 0) && (id_ex_r.reg_wr_addr != 0) && (id_ex_r.reg_wr_addr == if_id_r.fetched_inst[24:20]));
+		raw_hazard_rs1 <= ((if_id_r.rd != 0) && (id_ex_r.reg_wr_addr != 0) && (id_ex_r.reg_wr_addr == if_id_r.rs1));
+		raw_hazard_rs2 <= ((if_id_r.rd != 0) && (id_ex_r.reg_wr_addr != 0) && (id_ex_r.reg_wr_addr == if_id_r.rs2));
 	end
 
-	decode_unit instruction_decode(
+	decode_unit decode_stage(
 		.clk(clk),
 		.reset_n(reset_n),
 		.if_id_r(if_id_r),
@@ -95,7 +98,7 @@ module exec_unit (
 	assign alu_reg_input_a = raw_hazard_rs1? ex_wb_r.alu_result : regfile_rs1;
 	assign alu_reg_input_b = raw_hazard_rs2? ex_wb_r.alu_result : regfile_rs2;
 
-	alu_stage arithmetic_logic_unit(
+	arithmetic_logic_unit alu_stage(
 		.clk(clk),
 		.reset_n(reset_n),
 		.id_ex_r(id_ex_r),

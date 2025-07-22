@@ -21,13 +21,24 @@ module read_only_memory#(parameter ADDR_BITS = 16) (
 
 	import uvm_pkg::*;
 
-	logic [31:0] data [(1<<ADDR_BITS) - 1:0];
+	logic [7:0] data [(1<<ADDR_BITS) - 1:0];
+
+	assert property (@(posedge clk) rd_addr[1:0] == 2'b0);
+	//  else
+	// 	$display("Read address is not aligned to 4 bytes");
+	// 	`uvm_fatal("memsys", "Read address is not aligned to 4 bytes")
+
 	// assert (rd_addr[31:16] == '0) else
 	// 	`uvm_error(get_type_name(), $sformatf("Read address has high bits (>15) set: %h", rd_addr))
 	// assert (wr_addr[31:16] == '0) else
 	// 	`uvm_error(get_type_name(), $sformatf("Write address has high bits (>15) set: %h", wr_addr))
 
-	assign rd_data = rd_en ? data[rd_addr[ADDR_BITS-1 : 0]] : {32{1'bz}};
+	assign rd_data = rd_en ? {>>{
+			data[rd_addr + 3],
+			data[rd_addr + 2],
+			data[rd_addr + 1],
+			data[rd_addr + 0]
+		}}	: {32{1'bz}};
 
 	// always_ff @(posedge clk)
 	// begin

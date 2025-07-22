@@ -26,7 +26,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
 
   virtual function void write(input exec_core_message t);
     exec_core_message tx = exec_core_message::type_id::create("tx", this);
-		`uvm_info(get_type_name(), $sformatf("Pending regwrites:%1d Received exec_core_message:\n%s", transactions.size(), t.sprint()), UVM_MEDIUM)
+//		`uvm_info(get_type_name(), $sformatf("Pending regwrites:%1d Received exec_core_message:\n%s", transactions.size(), t.sprint()), UVM_MEDIUM)
     tx.copy(t);
 		if (tx.action == RESET) begin
 			// `uvm_info(get_type_name(), $sformatf("received a RESET action:\n%s", tx.sprint()), UVM_MEDIUM)
@@ -172,10 +172,11 @@ class exec_core_scoreboard extends uvm_scoreboard;
 				else if (tx.action == INST_SLLI) begin
 					tx.reg_wr_data = expected_reg_inputs[tx.rs1] << tx.shamt;
 					if (tx.rd != 0) begin
-						`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) << %1d",
+						`uvm_info(get_type_name(), $sformatf("r%1d(=%1d) = r%1d(=%1d) << %1d   (=%1d)",
 							tx.rd, expected_reg_inputs[tx.rd],
 							tx.rs1, expected_reg_inputs[tx.rs1],
-							tx.shamt), UVM_MEDIUM)
+							tx.shamt,
+							tx.reg_wr_data), UVM_MEDIUM)
 					end
 				end
 				else if (tx.action == INST_SRLI) begin
@@ -224,7 +225,7 @@ class exec_core_scoreboard extends uvm_scoreboard;
 						expected_reg_inputs[tx.rd] = tx.reg_wr_data;
 						`uvm_info(get_type_name(), $sformatf("r%1d =%1d",	tx.rd, signed'(expected_reg_inputs[tx.rd])), UVM_MEDIUM)
 				end
-				`uvm_info(get_type_name, $sformatf("Saving transaction:\n%s", tx.sprint()), UVM_MEDIUM)
+				// `uvm_info(get_type_name, $sformatf("Saving transaction:\n%s", tx.sprint()), UVM_MEDIUM)
 				transactions.push_back(tx);  // saved for later check
 			end
 		end

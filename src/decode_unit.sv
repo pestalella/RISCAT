@@ -3,6 +3,7 @@
 
 `include "alu_enums.svh"
 `include "pipeline_stage_registers.sv"
+`include "uvm_macros.svh"
 
 module decode_unit(
 	input logic clk,
@@ -40,11 +41,13 @@ module decode_unit(
 
 	assign is_reg_imm_inst = if_id_r.fetched_inst[6:0] == 7'b0010011;
 	assign is_reg_reg_inst = if_id_r.fetched_inst[6:0] == 7'b0110011;
+	assign is_jal = if_id_r.fetched_inst[6:0] == 7'b1101111;
+
 	assign inst_f3 = if_id_r.fetched_inst[14:12];
 	assign inst_f7 = if_id_r.fetched_inst[31:25];
 
 	assign is_addi  = is_reg_imm_inst && (inst_f3 == 'b000);
-	assign is_slli  = is_reg_imm_inst && (inst_f3 == 'b001);
+	assign is_slli  = is_reg_imm_inst && (inst_f7 == 'b0000000) && (inst_f3 == 'b001);
 	assign is_slti  = is_reg_imm_inst && (inst_f3 == 'b010);
 	assign is_sltiu = is_reg_imm_inst && (inst_f3 == 'b011);
 	assign is_xori  = is_reg_imm_inst && (inst_f3 == 'b100);
@@ -63,8 +66,6 @@ module decode_unit(
 	assign is_sra  = is_reg_reg_inst && (inst_f7 == 'b0100000) && (inst_f3 == 'b101);
 	assign is_or   = is_reg_reg_inst && (inst_f7 == 'b0000000) && (inst_f3 == 'b110);
 	assign is_and  = is_reg_reg_inst && (inst_f7 == 'b0000000) && (inst_f3 == 'b111);
-
-	assign is_jal = if_id_r.fetched_inst[6:0] == 7'b1101111;
 
 	always_ff @(posedge clk or negedge reset_n) begin
 		if (~reset_n) begin

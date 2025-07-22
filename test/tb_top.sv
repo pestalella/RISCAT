@@ -17,50 +17,50 @@ class random_inst_generator;
 
 	constraint few_jumps {
 		instr dist {
-			ADDI	:= 100,
-			SLTI 	:= 100,
-			SLTIU := 100,
-			XORI	:= 100,
-			ORI		:= 100,
-			ANDI 	:= 100,
-			SLLI 	:= 100,
-			SRLI 	:= 100,
-			SRAI 	:= 100,
-			ADD 	:= 100,
-			SUB 	:= 100,
-			SLL 	:= 100,
-			SLT		:= 100,
-			SLTU 	:= 100,
-			XOR 	:= 100,
-			SRL 	:= 100,
-			SRA 	:= 100,
-			OR 		:= 100,
-			AND 	:= 100,
-			JAL 	:= 1
+			ADDI	:= 1,
+			SLTI 	:= 1,
+			SLTIU := 1,
+			XORI	:= 1,
+			ORI		:= 1,
+			ANDI 	:= 1,
+			SLLI 	:= 1,
+			SRLI 	:= 1,
+			SRAI 	:= 1,
+			ADD 	:= 1,
+			SUB 	:= 1,
+			SLL 	:= 1,
+			SLT		:= 1,
+			SLTU 	:= 1,
+			XOR 	:= 1,
+			SRL 	:= 1,
+			SRA 	:= 1,
+			OR 		:= 1,
+			AND 	:= 1,
+			JAL 	:= 4
 		};
 	}
 
 	function bit[31:0] gen();
-			case(instr)
-					ADDI,	SLTI,	SLTIU,	XORI,	ORI,	ANDI,	SLLI,	SRLI,	SRAI: begin
-						reg_imm_inst inst_reg_imm;
-						inst_reg_imm = new(instr);
-						inst_reg_imm.randomize();
-						return inst_reg_imm.encoded();
-					end
-					ADD,	SUB,	SLL,	SLT,	SLTU,	XOR,	SRL,	SRA,	OR,	AND: begin
-						reg_reg_inst inst_reg_reg;
-						inst_reg_reg = new(instr);
-						inst_reg_reg.randomize();
-						return inst_reg_reg.encoded();
-					end
-					JAL: begin
-						jal_inst jump_inst;
-						jump_inst = new(instr);
-						jump_inst.randomize();
-						return jump_inst.encoded();
-					end
-			endcase
+		case(instr)
+				ADDI,	SLTI,	SLTIU,	XORI,	ORI,	ANDI,	SLLI,	SRLI,	SRAI: begin
+					reg_imm_inst inst_reg_imm;
+					inst_reg_imm = new(instr);
+					inst_reg_imm.randomize();
+					return inst_reg_imm.encoded();
+				end
+				ADD,	SUB,	SLL,	SLT,	SLTU,	XOR,	SRL,	SRA,	OR,	AND: begin
+					reg_reg_inst inst_reg_reg;
+					inst_reg_reg = new(instr);
+					inst_reg_reg.randomize();
+					return inst_reg_reg.encoded();
+				end
+				JAL: begin
+					jal_inst jump_inst;
+					jump_inst = new(instr);
+					jump_inst.randomize();
+					return jump_inst.encoded();
+				end
+		endcase
 	endfunction
 endclass
 
@@ -170,9 +170,18 @@ module top;
 		// instructions.data[52] = jump_inst.encoded();
 
 		rand_inst = new();
-		for (int i = 0; i < $size(instructions.data); i++) begin
-			rand_inst.randomize();// with { instr != JAL; };
-			instructions.data[i] = rand_inst.gen();
+		for (int i = 0; i < $size(instructions.data)/4; i++) begin
+			bit[31:0] encoded;
+
+			rand_inst.randomize();
+			encoded = rand_inst.gen();
+			if (i < 4) begin
+				`uvm_info("tb_top::init_memory", $sformatf("[%04h] Instruction: %08h", i, encoded), UVM_MEDIUM)
+			end
+			instructions.data[4*i+0] = encoded[7:0];
+			instructions.data[4*i+1] = encoded[15:8];
+			instructions.data[4*i+2] = encoded[23:16];
+			instructions.data[4*i+3] = encoded[31:24];
 		end
 
 
