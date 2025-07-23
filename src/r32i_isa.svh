@@ -132,21 +132,17 @@ class jal_inst extends riscv_instruction;
 	rand bit[20:1] jump_offset;
 	rand bit[4:0] rd;
 
-	constraint sane_jumps { jump_offset[0] == 0; jump_offset < 64; jump_offset > 0; };
+	constraint sane_jumps { jump_offset%2 == 0; };
 
 	function new(instruction inst);
 		super.new(inst);
 		opcode = 7'b1101111;
 	endfunction
 	function string sprint();
-		return $sformatf("JAL r%1d, %1d", rd, signed'(jump_offset));
+		return $sformatf("JAL r%1d, %1d", rd, signed'({jump_offset, 1'b0}));
 	endfunction
 
 	function bit[31:0] encoded();
-//		$display("JAL r%0d, %0d", rd, jump_offset);
-		assert (jump_offset[1] == 0) else begin
-			`uvm_fatal("jal_inst", "Randomization failed. jump_offset[1]!=0")
-		end
 		return {>>{{jump_offset[20], jump_offset[10:1], jump_offset[11], jump_offset[19:12]}, rd, opcode}};
 	endfunction
 endclass

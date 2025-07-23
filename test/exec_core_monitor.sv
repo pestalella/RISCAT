@@ -36,7 +36,7 @@ class exec_core_monitor extends uvm_monitor;
 			end else begin
 				if (execunit_vif.is_jump) begin
 					`uvm_info(get_type_name(), $sformatf("Detected a jump from PC=%1d to PC=%1d",
-						execunit_vif.pc, execunit_vif.pc + signed'(execunit_vif.jump_offset)), UVM_MEDIUM);
+						execunit_vif.pc, execunit_vif.pc + signed'({execunit_vif.jump_offset, 1'b0})), UVM_MEDIUM);
 
 					tx = exec_core_message::type_id::create("tx", this);
 					tx.action  = JUMP;
