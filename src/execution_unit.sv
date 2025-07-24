@@ -24,22 +24,11 @@ module exec_unit (
 	logic [15:0] pc;
 	logic jump_was_fetched;
 
-	assign rd_ram_en = reset_n;
-
-	// Update program counter
-	always_ff @(posedge clk or negedge reset_n) begin
-		if (~reset_n) begin
-			pc  <= 0;
-		end else if (id_ex_r.is_jump) begin
-			pc <= id_ex_r.pc + {id_ex_r.jump_offset, 1'b0};
-		end	else begin
-			pc  <= pc + 4;
-		end
-	end
-
 	IF_ID if_id_r;
 	ID_EX id_ex_r;
 	EX_WB ex_wb_r;
+
+	assign rd_ram_en = reset_n;
 
 	wire wb_wr_en;
 	wire [4:0] wb_wr_addr;
@@ -50,10 +39,29 @@ module exec_unit (
 
 	logic raw_hazard_rs1;
 	logic raw_hazard_rs2;
+	bit jump_in_progress;
 
 	assert property(@(posedge clk) !$isunknown(id_ex_r));
 	assert property(@(posedge clk) (pc[1:0] == 2'b0)) else begin
 				`uvm_fatal("Exec Unit", $sformatf("Misaligned PC: %04h", pc))
+	end
+
+	// Update program counter
+	always_ff @(posedge clk or negedge reset_n) begin
+		if (~reset_n) begin
+			pc  <= 0;
+		end else begin
+			if (jump_was_fetched) begin
+				jump_in_progress <= 1;
+			end
+
+			if (id_ex_r.is_jump) begin
+				pc <= id_ex_r.pc + {id_ex_r.jump_offset, 1'b0};
+				jump_in_progress <= 0;
+			end else if (~jump_in_progress) begin
+				pc <= pc + 4;
+			end
+		end
 	end
 
 	fetch_unit fetch_stage(
@@ -61,6 +69,7 @@ module exec_unit (
 		.reset_n(reset_n),
 		.pc(pc),
 		.rd_ram_data(rd_ram_data),
+		.jump_in_progress(jump_in_progress),
 		.jump_was_fetched(jump_was_fetched),
 		.rd_ram_addr(rd_ram_addr),
 		.if_id_r(if_id_r)

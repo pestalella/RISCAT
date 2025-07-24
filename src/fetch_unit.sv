@@ -8,6 +8,7 @@ module fetch_unit(
 	input logic reset_n,
 	input logic [15:0] pc,
 	input logic [31:0] rd_ram_data,
+	input logic jump_in_progress,
 
 	output logic jump_was_fetched,
 	output logic [15:0] rd_ram_addr,
@@ -19,7 +20,7 @@ module fetch_unit(
 		if (~reset_n) begin
 			if_id_r <= '{default:0};
 			jump_was_fetched <= 0;
-		end else if (jump_was_fetched) begin
+		end else if (jump_was_fetched | jump_in_progress) begin
 			// Inject a NOP if the previous instruction was a jump
 			if_id_r.pc <= if_id_r.pc;
 			if_id_r.fetched_inst <= '{default:0};
