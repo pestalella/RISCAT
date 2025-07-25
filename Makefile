@@ -1,12 +1,12 @@
-VIVADO_LIB_PATH=/home/pau/Xilinx/Vivado/2024.2/lib/
-VIVADO_BIN_PATH=/home/pau/Xilinx/Vivado/2024.2/bin/
+VIVADO_LIB_PATH=/opt/Xilinx/2025.1/Vivado/lib
+VIVADO_BIN_PATH=/opt/Xilinx/2025.1/Vivado/bin/
 
-#LD_LIBRARY_PATH=$(LD_LIBRARY_PATH):$(VIVADO_LIB_PATH)
 XELAB=$(VIVADO_BIN_PATH)/xelab
 XVLOG=$(VIVADO_BIN_PATH)/xvlog
 XSIM=$(VIVADO_BIN_PATH)/xsim
 
 RANDOM := $(shell bash -c 'echo $$RANDOM')
+#RANDOM := 18954
 
 all: compile elab
 
